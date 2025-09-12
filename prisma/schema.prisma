@@ -1,0 +1,186 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  phoneNumber   String?   @unique
+  role          Role      @default(VIEWER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+
+  // Relations for audit fields on orders
+  createdOrders  Order[] @relation("OrderCreatedBy")
+  editedOrders   Order[] @relation("OrderEditedBy")
+  processedOrders Order[] @relation("OrderProcessedBy")
+
+  // Relations for audit fields on gallery items
+  createdGalleryItems GalleryItem[] @relation("CreatedByGalleryItems")
+  updatedGalleryItems GalleryItem[] @relation("UpdatedByGalleryItems")
+  deletedGalleryItems GalleryItem[] @relation("DeletedByGalleryItems")
+}
+
+model Customer {
+  id           String   @id @default(cuid())
+  name         String
+  businessName String?
+  businessType BusinessType
+  email        String   @unique
+  phone        String
+  location     String?
+  address      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  orders       Order[]
+}
+
+model Order {
+  id           String    @id @default(cuid())
+  customerId   String
+  customer     Customer  @relation(fields: [customerId], references: [id])
+  status       OrderStatus @default(RECEIVED)
+  totalAmount  Float
+
+  // Audit trail fields - references to User who performed actions
+  createdById   String?
+  createdBy     User?     @relation("OrderCreatedBy", fields: [createdById], references: [id])
+  editedById    String?
+  editedBy      User?     @relation("OrderEditedBy", fields: [editedById], references: [id])
+  processedById String?
+  processedBy   User?     @relation("OrderProcessedBy", fields: [processedById], references: [id])
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  orderItems   OrderItem[]
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  orderId    String
+  order      Order   @relation(fields: [orderId], references: [id])
+  productId  String
+  product    Product @relation(fields: [productId], references: [id])
+  quantity   Int
+  price      Float   // Price at time of order (wholesale or retail)
+  amount     Float   // price * quantity
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  name           String
+  image          String?
+  size           String
+  wholesalePrice Int
+  retailPrice    Int
+  description    String?
+  discount       Int?     @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  category       Category
+  orderItems     OrderItem[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+}
+
+model GalleryItem {
+  id          String          @id @default(cuid())
+  type        GalleryItemType
+  title       String
+  thumbnail   String
+  src         String
+  createdById String?
+  createdBy   User?           @relation("CreatedByGalleryItems", fields: [createdById], references: [id])
+  updatedById String?
+  updatedBy   User?           @relation("UpdatedByGalleryItems", fields: [updatedById], references: [id])
+  deletedById String?
+  deletedBy   User?           @relation("DeletedByGalleryItems", fields: [deletedById], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+enum GalleryItemType {
+  photo
+  video
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum Category {
+  Beer
+  Wine
+  Spirits
+  Liqueur
+  Cocktail
+  SoftDrink
+  Juice
+  Mocktail
+  Water
+}
+
+enum OrderStatus {
+  RECEIVED
+  CANCELED
+  PROCESSING
+  SHIPPED
+  COMPLETED
+}
+
+enum BusinessType {
+  WHOLESALE
+  RETAIL
+}
