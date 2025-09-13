@@ -11,7 +11,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
+  // CommandShortcut,
 } from "cmdk"
 import { cn } from "@/lib/utils"
 
@@ -39,5 +39,5 @@ export {
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
+  //CommandShortcut,
 }

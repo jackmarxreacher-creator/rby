@@ -3,15 +3,34 @@ import { getCustomer } from "../actions";
 import { EditCustomerClient } from "./EditCustomerClient";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function EditCustomerPage({ params }: PageProps) {
-  const customer = await getCustomer(params.id);
+  const { id } = await params; // await the promise
+  const customer = await getCustomer(id);
   if (!customer) notFound();
 
   return <EditCustomerClient customer={customer} />;
 }
+
+
+
+
+// import { notFound } from "next/navigation";
+// import { getCustomer } from "../actions";
+// import { EditCustomerClient } from "./EditCustomerClient";
+
+// interface PageProps {
+//   params: { id: string };
+// }
+
+// export default async function EditCustomerPage({ params }: PageProps) {
+//   const customer = await getCustomer(params.id);
+//   if (!customer) notFound();
+
+//   return <EditCustomerClient customer={customer} />;
+// }
 
 
 
