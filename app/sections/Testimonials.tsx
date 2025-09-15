@@ -32,7 +32,7 @@ const testimonials = [
   {
     name: 'Kofi Dankwa',
     quote: 'Fantastic wholesale pricing and reliable supply every month.',
-    image: '/images/customers/Kofi_Dankwa.webp',
+    image: '/images/customers/Kofi_Dankwa.jpg',
     rating: 4,
   },
   {

@@ -22,7 +22,7 @@ export const rbyBrands = [
   { name: 'ABC', image: '/images/brands/abc.png' },
   { name: 'Singleton', image: '/images/brands/thesingleton.png' },
   { name: 'Alvaro', image: '/images/brands/alvaro.png' },
-  { name: 'Heineken', image: '/images/brands/Heineken.png' },
+  { name: 'Heineken', image: '/images/brands/heineken.png' },
   { name: 'Gulder\'s', image: '/images/brands/gulder.png' },
   { name: 'Zacapa', image: '/images/brands/zacapa.png' },
   { name: 'Vat 69', image: '/images/brands/vat69.png' },

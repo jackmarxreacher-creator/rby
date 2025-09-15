@@ -11,6 +11,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { ProductActions } from "./ProductActions";
+import type { Product } from "@prisma/client";
 
 interface Props {
   products: Product[];
@@ -71,7 +72,8 @@ export function ProductCard({ products }: Props) {
                     GHS {product.retailPrice}
                   </span>
                 </div>
-                {product.discount > 0 && (
+                {/* ✅ null-safe check */}
+                {product.discount != null && product.discount > 0 && (
                   <div className="text-xs bg-[#206b50]/20 text-[#206b50] px-2 py-1 rounded inline-block">
                     -{product.discount}%
                   </div>
@@ -113,6 +115,248 @@ export function ProductCard({ products }: Props) {
     </>
   );
 }
+
+
+
+
+// "use client";
+
+// import { useMemo, useState } from "react";
+// import Image from "next/image";
+// import {
+//   Card,
+//   CardHeader,
+//   CardTitle,
+//   CardDescription,
+//   CardContent,
+//   CardFooter,
+// } from "@/components/ui/card";
+// import { ProductActions } from "./ProductActions";
+// import type { Product } from "@prisma/client"; // ← import type
+
+// interface Props {
+//   products: Product[];
+// }
+
+// const ITEMS_PER_PAGE = 8; // 2×4 grid
+
+// export function ProductCard({ products }: Props) {
+//   const [currentPage, setCurrentPage] = useState(1);
+
+//   const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+//   const currentRows = useMemo(() => {
+//     const start = (currentPage - 1) * ITEMS_PER_PAGE;
+//     return products.slice(start, start + ITEMS_PER_PAGE);
+//   }, [currentPage, products]);
+
+//   const goToPage = (page: number) => {
+//     if (page < 1 || page > totalPages) return;
+//     setCurrentPage(page);
+//   };
+
+//   return (
+//     <>
+//       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+//         {currentRows.map((product) => (
+//           <Card
+//             key={product.id}
+//             className="bg-[#fcfbf8] border border-[#cccccc] rounded-xl shadow-sm hover:shadow-lg"
+//           >
+//             <CardHeader className="p-3">
+//               <Image
+//                 src={product.image || "/placeholder.jpg"}
+//                 alt={product.name}
+//                 width={225}
+//                 height={150}
+//                 className="w-full h-40 object-contain rounded-t-xl"
+//               />
+//             </CardHeader>
+
+//             <CardContent className="p-4">
+//               <CardTitle className="text-lg text-[#1c1c1c]">
+//                 {product.name}
+//               </CardTitle>
+//               <CardDescription className="text-sm text-[#4a4a4a]">
+//                 {product.size}
+//               </CardDescription>
+
+//               <div className="mt-2 space-y-1">
+//                 <div className="flex justify-between text-sm">
+//                   <span className="text-[#4a4a4a]">Wholesale:</span>
+//                   <span className="text-[#9b7c4a] font-medium">
+//                     GHS {product.wholesalePrice}
+//                   </span>
+//                 </div>
+//                 <div className="flex justify-between text-sm">
+//                   <span className="text-[#4a4a4a]">Retail:</span>
+//                   <span className="text-[#be965b] font-semibold">
+//                     GHS {product.retailPrice}
+//                   </span>
+//                 </div>
+//                 {product.discount > 0 && (
+//                   <div className="text-xs bg-[#206b50]/20 text-[#206b50] px-2 py-1 rounded inline-block">
+//                     -{product.discount}%
+//                   </div>
+//                 )}
+//               </div>
+//             </CardContent>
+
+//             <CardFooter className="p-4 border-t border-[#cccccc]">
+//               <ProductActions product={product} />
+//             </CardFooter>
+//           </Card>
+//         ))}
+//       </div>
+
+//       {/* ----  PAGINATION  ---- */}
+//       {totalPages > 1 && (
+//         <div className="flex justify-center items-center gap-4 mt-8">
+//           <button
+//             onClick={() => goToPage(currentPage - 1)}
+//             disabled={currentPage === 1}
+//             className="px-4 py-2 rounded border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#f3ede5]"
+//           >
+//             Previous
+//           </button>
+
+//           <span className="font-medium text-sm">
+//             Page {currentPage} of {totalPages}
+//           </span>
+
+//           <button
+//             onClick={() => goToPage(currentPage + 1)}
+//             disabled={currentPage === totalPages}
+//             className="px-4 py-2 rounded border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#f3ede5]"
+//           >
+//             Next
+//           </button>
+//         </div>
+//       )}
+//     </>
+//   );
+// }
+
+
+
+
+
+
+
+// "use client";
+
+// import { useMemo, useState } from "react";
+// import Image from "next/image";
+// import {
+//   Card,
+//   CardHeader,
+//   CardTitle,
+//   CardDescription,
+//   CardContent,
+//   CardFooter,
+// } from "@/components/ui/card";
+// import { ProductActions } from "./ProductActions";
+
+// interface Props {
+//   products: Product[];
+// }
+
+// const ITEMS_PER_PAGE = 8; // 2×4 grid
+
+// export function ProductCard({ products }: Props) {
+//   const [currentPage, setCurrentPage] = useState(1);
+
+//   const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+//   const currentRows = useMemo(() => {
+//     const start = (currentPage - 1) * ITEMS_PER_PAGE;
+//     return products.slice(start, start + ITEMS_PER_PAGE);
+//   }, [currentPage, products]);
+
+//   const goToPage = (page: number) => {
+//     if (page < 1 || page > totalPages) return;
+//     setCurrentPage(page);
+//   };
+
+//   return (
+//     <>
+//       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+//         {currentRows.map((product) => (
+//           <Card
+//             key={product.id}
+//             className="bg-[#fcfbf8] border border-[#cccccc] rounded-xl shadow-sm hover:shadow-lg"
+//           >
+//             <CardHeader className="p-3">
+//               <Image
+//                 src={product.image || "/placeholder.jpg"}
+//                 alt={product.name}
+//                 width={225}
+//                 height={150}
+//                 className="w-full h-40 object-contain rounded-t-xl"
+//               />
+//             </CardHeader>
+
+//             <CardContent className="p-4">
+//               <CardTitle className="text-lg text-[#1c1c1c]">
+//                 {product.name}
+//               </CardTitle>
+//               <CardDescription className="text-sm text-[#4a4a4a]">
+//                 {product.size}
+//               </CardDescription>
+
+//               <div className="mt-2 space-y-1">
+//                 <div className="flex justify-between text-sm">
+//                   <span className="text-[#4a4a4a]">Wholesale:</span>
+//                   <span className="text-[#9b7c4a] font-medium">
+//                     GHS {product.wholesalePrice}
+//                   </span>
+//                 </div>
+//                 <div className="flex justify-between text-sm">
+//                   <span className="text-[#4a4a4a]">Retail:</span>
+//                   <span className="text-[#be965b] font-semibold">
+//                     GHS {product.retailPrice}
+//                   </span>
+//                 </div>
+//                 {product.discount > 0 && (
+//                   <div className="text-xs bg-[#206b50]/20 text-[#206b50] px-2 py-1 rounded inline-block">
+//                     -{product.discount}%
+//                   </div>
+//                 )}
+//               </div>
+//             </CardContent>
+
+//             <CardFooter className="p-4 border-t border-[#cccccc]">
+//               <ProductActions product={product} />
+//             </CardFooter>
+//           </Card>
+//         ))}
+//       </div>
+
+//       {/* ----  PAGINATION  ---- */}
+//       {totalPages > 1 && (
+//         <div className="flex justify-center items-center gap-4 mt-8">
+//           <button
+//             onClick={() => goToPage(currentPage - 1)}
+//             disabled={currentPage === 1}
+//             className="px-4 py-2 rounded border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#f3ede5]"
+//           >
+//             Previous
+//           </button>
+
+//           <span className="font-medium text-sm">
+//             Page {currentPage} of {totalPages}
+//           </span>
+
+//           <button
+//             onClick={() => goToPage(currentPage + 1)}
+//             disabled={currentPage === totalPages}
+//             className="px-4 py-2 rounded border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#f3ede5]"
+//           >
+//             Next
+//           </button>
+//         </div>
+//       )}
+//     </>
+//   );
+// }
 
 
 

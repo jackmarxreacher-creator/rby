@@ -48,9 +48,9 @@ export function DeleteDialog({ productId }: Props) {
             Cancel
           </Button>
           <Button
-            variant="destructive"
+            variant="outline"
             onClick={handleDelete}
-            className="bg-burgundy hover:bg-burgundy/80"
+            className="bg-red-600 hover:bg-red-700 text-white border-red-600"
           >
             Delete
           </Button>

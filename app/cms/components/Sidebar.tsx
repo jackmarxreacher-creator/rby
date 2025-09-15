@@ -1,9 +1,10 @@
+// app/cms/components/Sidebar.tsx
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { authClient } from "@/lib/auth-client";
+import { authClient, useSession } from "@/lib/auth-client";
 import { getUser } from "@/app/cms/users/actions";
 import {
   LayoutDashboard,
@@ -29,9 +30,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useEffect, useState } from "react";
 
+/* ----------  updated local type: name can be null  ---------- */
 type User = {
   id: string;
-  name: string;
+  name: string | null;
   email: string;
   image?: string | null;
 };
@@ -52,17 +54,12 @@ export default function Sidebar() {
   ];
 
   useEffect(() => {
-    authClient.session().then(async (session) => {
-      if (!session?.user?.id) return;
+    const { data: session } = useSession();
+    if (!session?.user?.id) return;
 
-      try {
-        const dbUser = await getUser(session.user.id);
-        setUser(dbUser || session.user);
-      } catch (err) {
-        console.error("getUser failed:", err);
-        setUser(session.user as User);
-      }
-    });
+    getUser(session.user.id)
+      .then((dbUser) => setUser(dbUser ?? session.user))
+      .catch(() => setUser(session.user));
   }, []);
 
   return (
@@ -102,19 +99,18 @@ export default function Sidebar() {
 
       {/* Footer with Profile + Logout */}
       <div className="p-4 border-t border-neutral-800 text-sm text-gray-400 space-y-4">
-        {/* Profile Section */}
         <div className="flex items-center space-x-3">
           {user ? (
             <>
               <Image
                 src={user.image || "/images/user.jpg"}
-                alt={user.name}
+                alt={user.name ?? "User"}
                 width={40}
                 height={40}
                 className="rounded-full object-cover border border-neutral-700"
               />
               <div>
-                <p className="font-medium text-white">{user.name}</p>
+                <p className="font-medium text-white">{user.name ?? "User"}</p>
                 <p className="text-xs text-gray-400">{user.email}</p>
               </div>
             </>
@@ -126,7 +122,6 @@ export default function Sidebar() {
           )}
         </div>
 
-        {/* Logout Button */}
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <button className="flex items-center space-x-3 px-3 py-2 rounded-md text-red-400 hover:bg-neutral-800 hover:text-red transition w-full text-left">
@@ -145,7 +140,7 @@ export default function Sidebar() {
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 onClick={async () => {
-                  await new authClient().signOut();
+                  await authClient.signOut();
                   window.location.href = "/";
                 }}
               >
@@ -158,6 +153,1159 @@ export default function Sidebar() {
     </aside>
   );
 }
+
+
+
+
+// // app/cms/components/Sidebar.tsx
+// "use client";
+
+// import Link from "next/link";
+// import { usePathname } from "next/navigation";
+// import Image from "next/image";
+// import { authClient, useSession } from "@/lib/auth-client"; // ✅ import the hook
+// import { getUser } from "@/app/cms/users/actions";
+// import {
+//   LayoutDashboard,
+//   Users,
+//   FileText,
+//   Image as ImageIcon,
+//   Settings,
+//   ClipboardList,
+//   UsersRound,
+//   Package,
+//   LogOut,
+// } from "lucide-react";
+// import {
+//   AlertDialog,
+//   AlertDialogTrigger,
+//   AlertDialogContent,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogCancel,
+//   AlertDialogAction,
+// } from "@/components/ui/alert-dialog";
+// import { useEffect, useState } from "react";
+
+// type Session = {
+//   user: {
+//     id: string;
+//     name: string;
+//     email: string;
+//     image?: string | null;
+//   };
+// };
+
+// export default function Sidebar() {
+//   const pathname = usePathname();
+//   const [user, setUser] = useState<Session["user"] | null>(null);
+
+//   const links = [
+//     { href: "/cms", label: "Dashboard", icon: LayoutDashboard },
+//     { href: "/cms/customers", label: "Customers", icon: Users },
+//     { href: "/cms/requests", label: "Requests", icon: ClipboardList },
+//     { href: "/cms/products", label: "Products", icon: Package },
+//     { href: "/cms/blog", label: "Blog Posts", icon: FileText },
+//     { href: "/cms/users", label: "Users & Roles", icon: UsersRound },
+//     { href: "/cms/gallery", label: "Gallery", icon: ImageIcon },
+//     { href: "/cms/settings", label: "Settings", icon: Settings },
+//   ];
+
+//   /* ----------  use the hook  ---------- */
+//   useEffect(() => {
+//     const { data: session } = useSession(); // ✅ callable hook
+//     if (!session?.user?.id) return;
+
+//     getUser(session.user.id)
+//       .then((dbUser) => setUser(dbUser ?? session.user))
+//       .catch(() => setUser(session.user));
+//   }, []);
+
+//   return (
+//     <aside className="w-64 bg-black text-white flex flex-col h-full">
+//       {/* Logo */}
+//       <div className="p-4 font-bold text-lg border-b border-neutral-800 flex items-center space-x-3">
+//         <Image
+//           src={user?.image || "/images/logos/rby_color_logo.webp"}
+//           alt="RBY Logo"
+//           width={32}
+//           height={32}
+//           className="object-contain"
+//         />
+//         <div>
+//           <span>RBY LTD.</span>
+//           <p className="text-xs text-gray-400">Content Management</p>
+//         </div>
+//       </div>
+
+//       {/* Nav Links */}
+//       <nav className="flex-1 p-4 space-y-2">
+//         {links.map(({ href, label, icon: Icon }) => (
+//           <Link
+//             key={href}
+//             href={href}
+//             className={`flex items-center space-x-3 px-3 py-2 rounded-md transition ${
+//               pathname === href
+//                 ? "bg-[#be965b] text-black font-medium"
+//                 : "text-gray-300 hover:bg-neutral-800"
+//             }`}
+//           >
+//             <Icon className="h-5 w-5" />
+//             <span>{label}</span>
+//           </Link>
+//         ))}
+//       </nav>
+
+//       {/* Footer with Profile + Logout */}
+//       <div className="p-4 border-t border-neutral-800 text-sm text-gray-400 space-y-4">
+//         {/* Profile Section */}
+//         <div className="flex items-center space-x-3">
+//           {user ? (
+//             <>
+//               <Image
+//                 src={user.image || "/images/user.jpg"}
+//                 alt={user.name}
+//                 width={40}
+//                 height={40}
+//                 className="rounded-full object-cover border border-neutral-700"
+//               />
+//               <div>
+//                 <p className="font-medium text-white">{user.name}</p>
+//                 <p className="text-xs text-gray-400">{user.email}</p>
+//               </div>
+//             </>
+//           ) : (
+//             <div>
+//               <p className="font-medium text-white">Loading…</p>
+//               <p className="text-xs text-gray-400">please wait</p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Logout Button */}
+//         <AlertDialog>
+//           <AlertDialogTrigger asChild>
+//             <button className="flex items-center space-x-3 px-3 py-2 rounded-md text-red-400 hover:bg-neutral-800 hover:text-red transition w-full text-left">
+//               <LogOut className="h-5 w-5" />
+//               <span>Logout</span>
+//             </button>
+//           </AlertDialogTrigger>
+//           <AlertDialogContent>
+//             <AlertDialogHeader>
+//               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+//               <AlertDialogDescription>
+//                 You will be logged out and redirected to the homepage.
+//               </AlertDialogDescription>
+//             </AlertDialogHeader>
+//             <AlertDialogFooter>
+//               <AlertDialogCancel>Cancel</AlertDialogCancel>
+//               <AlertDialogAction
+//                 onClick={async () => {
+//                   await authClient.signOut();
+//                   window.location.href = "/";
+//                 }}
+//               >
+//                 Logout
+//               </AlertDialogAction>
+//             </AlertDialogFooter>
+//           </AlertDialogContent>
+//         </AlertDialog>
+//       </div>
+//     </aside>
+//   );
+// }
+
+
+
+
+
+// "use client";
+
+// import Link from "next/link";
+// import { usePathname } from "next/navigation";
+// import Image from "next/image";
+// import { useSession } from 'better-auth/client'; // <-- real hook, from the same package
+// import { authClient } from "@/lib/auth-client";
+// import { getUser } from "@/app/cms/users/actions";
+// import {
+//   LayoutDashboard,
+//   Users,
+//   FileText,
+//   Image as ImageIcon,
+//   Settings,
+//   ClipboardList,
+//   UsersRound,
+//   Package,
+//   LogOut,
+// } from "lucide-react";
+// import {
+//   AlertDialog,
+//   AlertDialogTrigger,
+//   AlertDialogContent,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogCancel,
+//   AlertDialogAction,
+// } from "@/components/ui/alert-dialog";
+// import { useEffect, useState } from "react";
+
+// type Session = {
+//   user: {
+//     id: string;
+//     name: string;
+//     email: string;
+//     image?: string | null;
+//   };
+// };
+
+// export default function Sidebar() {
+//   const pathname = usePathname();
+//   const [user, setUser] = useState<Session["user"] | null>(null);
+
+//   const links = [
+//     { href: "/cms", label: "Dashboard", icon: LayoutDashboard },
+//     { href: "/cms/customers", label: "Customers", icon: Users },
+//     { href: "/cms/requests", label: "Requests", icon: ClipboardList },
+//     { href: "/cms/products", label: "Products", icon: Package },
+//     { href: "/cms/blog", label: "Blog Posts", icon: FileText },
+//     { href: "/cms/users", label: "Users & Roles", icon: UsersRound },
+//     { href: "/cms/gallery", label: "Gallery", icon: ImageIcon },
+//     { href: "/cms/settings", label: "Settings", icon: Settings },
+//   ];
+
+//   useEffect(() => {
+//     const { data: session } = useSession(); // <-- now callable
+//     if (!session?.user?.id) return;
+
+//     getUser(session.user.id)
+//       .then((dbUser) => setUser(dbUser ?? session.user))
+//       .catch(() => setUser(session.user));
+//   }, []);
+
+//   return (
+//     <aside className="w-64 bg-black text-white flex flex-col h-full">
+//       {/* Logo */}
+//       <div className="p-4 font-bold text-lg border-b border-neutral-800 flex items-center space-x-3">
+//         <Image
+//           src={user?.image || "/images/logos/rby_color_logo.webp"}
+//           alt="RBY Logo"
+//           width={32}
+//           height={32}
+//           className="object-contain"
+//         />
+//         <div>
+//           <span>RBY LTD.</span>
+//           <p className="text-xs text-gray-400">Content Management</p>
+//         </div>
+//       </div>
+
+//       {/* Nav Links */}
+//       <nav className="flex-1 p-4 space-y-2">
+//         {links.map(({ href, label, icon: Icon }) => (
+//           <Link
+//             key={href}
+//             href={href}
+//             className={`flex items-center space-x-3 px-3 py-2 rounded-md transition ${
+//               pathname === href
+//                 ? "bg-[#be965b] text-black font-medium"
+//                 : "text-gray-300 hover:bg-neutral-800"
+//             }`}
+//           >
+//             <Icon className="h-5 w-5" />
+//             <span>{label}</span>
+//           </Link>
+//         ))}
+//       </nav>
+
+//       {/* Footer with Profile + Logout */}
+//       <div className="p-4 border-t border-neutral-800 text-sm text-gray-400 space-y-4">
+//         <div className="flex items-center space-x-3">
+//           {user ? (
+//             <>
+//               <Image
+//                 src={user.image || "/images/user.jpg"}
+//                 alt={user.name}
+//                 width={40}
+//                 height={40}
+//                 className="rounded-full object-cover border border-neutral-700"
+//               />
+//               <div>
+//                 <p className="font-medium text-white">{user.name}</p>
+//                 <p className="text-xs text-gray-400">{user.email}</p>
+//               </div>
+//             </>
+//           ) : (
+//             <div>
+//               <p className="font-medium text-white">Loading…</p>
+//               <p className="text-xs text-gray-400">please wait</p>
+//             </div>
+//           )}
+//         </div>
+
+//         <AlertDialog>
+//           <AlertDialogTrigger asChild>
+//             <button className="flex items-center space-x-3 px-3 py-2 rounded-md text-red-400 hover:bg-neutral-800 hover:text-red transition w-full text-left">
+//               <LogOut className="h-5 w-5" />
+//               <span>Logout</span>
+//             </button>
+//           </AlertDialogTrigger>
+//           <AlertDialogContent>
+//             <AlertDialogHeader>
+//               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+//               <AlertDialogDescription>
+//                 You will be logged out and redirected to the homepage.
+//               </AlertDialogDescription>
+//             </AlertDialogHeader>
+//             <AlertDialogFooter>
+//               <AlertDialogCancel>Cancel</AlertDialogCancel>
+//               <AlertDialogAction
+//                 onClick={async () => {
+//                   await authClient.signOut();
+//                   window.location.href = "/";
+//                 }}
+//               >
+//                 Logout
+//               </AlertDialogAction>
+//             </AlertDialogFooter>
+//           </AlertDialogContent>
+//         </AlertDialog>
+//       </div>
+//     </aside>
+//   );
+// }
+
+
+
+
+
+
+
+// // app/cms/components/Sidebar.tsx
+// "use client";
+
+// import Link from "next/link";
+// import { usePathname } from "next/navigation";
+// import Image from "next/image";
+// import { useSession } from 'better-auth/react'; // <-- real hook
+// import { getUser } from "@/app/cms/users/actions";
+// import {
+//   LayoutDashboard,
+//   Users,
+//   FileText,
+//   Image as ImageIcon,
+//   Settings,
+//   ClipboardList,
+//   UsersRound,
+//   Package,
+//   LogOut,
+// } from "lucide-react";
+// import {
+//   AlertDialog,
+//   AlertDialogTrigger,
+//   AlertDialogContent,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogCancel,
+//   AlertDialogAction,
+// } from "@/components/ui/alert-dialog";
+// import { useEffect, useState } from "react";
+
+// type Session = {
+//   user: {
+//     id: string;
+//     name: string;
+//     email: string;
+//     image?: string | null;
+//   };
+// };
+
+// export default function Sidebar() {
+//   const pathname = usePathname();
+//   const [user, setUser] = useState<Session["user"] | null>(null);
+
+//   const links = [
+//     { href: "/cms", label: "Dashboard", icon: LayoutDashboard },
+//     { href: "/cms/customers", label: "Customers", icon: Users },
+//     { href: "/cms/requests", label: "Requests", icon: ClipboardList },
+//     { href: "/cms/products", label: "Products", icon: Package },
+//     { href: "/cms/blog", label: "Blog Posts", icon: FileText },
+//     { href: "/cms/users", label: "Users & Roles", icon: UsersRound },
+//     { href: "/cms/gallery", label: "Gallery", icon: ImageIcon },
+//     { href: "/cms/settings", label: "Settings", icon: Settings },
+//   ];
+
+//   /* ----------  real hook  ---------- */
+//   useEffect(() => {
+//     const { data: session } = useSession(); // <-- callable hook
+//     if (!session?.user?.id) return;
+
+//     getUser(session.user.id)
+//       .then((dbUser) => setUser(dbUser ?? session.user))
+//       .catch(() => setUser(session.user));
+//   }, []);
+
+//   return (
+//     <aside className="w-64 bg-black text-white flex flex-col h-full">
+//       {/* Logo */}
+//       <div className="p-4 font-bold text-lg border-b border-neutral-800 flex items-center space-x-3">
+//         <Image
+//           src={user?.image || "/images/logos/rby_color_logo.webp"}
+//           alt="RBY Logo"
+//           width={32}
+//           height={32}
+//           className="object-contain"
+//         />
+//         <div>
+//           <span>RBY LTD.</span>
+//           <p className="text-xs text-gray-400">Content Management</p>
+//         </div>
+//       </div>
+
+//       {/* Nav Links */}
+//       <nav className="flex-1 p-4 space-y-2">
+//         {links.map(({ href, label, icon: Icon }) => (
+//           <Link
+//             key={href}
+//             href={href}
+//             className={`flex items-center space-x-3 px-3 py-2 rounded-md transition ${
+//               pathname === href
+//                 ? "bg-[#be965b] text-black font-medium"
+//                 : "text-gray-300 hover:bg-neutral-800"
+//             }`}
+//           >
+//             <Icon className="h-5 w-5" />
+//             <span>{label}</span>
+//           </Link>
+//         ))}
+//       </nav>
+
+//       {/* Footer with Profile + Logout */}
+//       <div className="p-4 border-t border-neutral-800 text-sm text-gray-400 space-y-4">
+//         {/* Profile Section */}
+//         <div className="flex items-center space-x-3">
+//           {user ? (
+//             <>
+//               <Image
+//                 src={user.image || "/images/user.jpg"}
+//                 alt={user.name}
+//                 width={40}
+//                 height={40}
+//                 className="rounded-full object-cover border border-neutral-700"
+//               />
+//               <div>
+//                 <p className="font-medium text-white">{user.name}</p>
+//                 <p className="text-xs text-gray-400">{user.email}</p>
+//               </div>
+//             </>
+//           ) : (
+//             <div>
+//               <p className="font-medium text-white">Loading…</p>
+//               <p className="text-xs text-gray-400">please wait</p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Logout Button */}
+//         <AlertDialog>
+//           <AlertDialogTrigger asChild>
+//             <button className="flex items-center space-x-3 px-3 py-2 rounded-md text-red-400 hover:bg-neutral-800 hover:text-red transition w-full text-left">
+//               <LogOut className="h-5 w-5" />
+//               <span>Logout</span>
+//             </button>
+//           </AlertDialogTrigger>
+//           <AlertDialogContent>
+//             <AlertDialogHeader>
+//               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+//               <AlertDialogDescription>
+//                 You will be logged out and redirected to the homepage.
+//               </AlertDialogDescription>
+//             </AlertDialogHeader>
+//             <AlertDialogFooter>
+//               <AlertDialogCancel>Cancel</AlertDialogCancel>
+//               <AlertDialogAction
+//                 onClick={async () => {
+//                   await authClient.signOut();
+//                   window.location.href = "/";
+//                 }}
+//               >
+//                 Logout
+//               </AlertDialogAction>
+//             </AlertDialogFooter>
+//           </AlertDialogContent>
+//         </AlertDialog>
+//       </div>
+//     </aside>
+//   );
+// }
+
+
+
+
+
+
+
+// "use client";
+
+// import Link from "next/link";
+// import { usePathname } from "next/navigation";
+// import Image from "next/image";
+// import { authClient } from "@/lib/auth-client";
+// import { getUser } from "@/app/cms/users/actions";
+// import {
+//   LayoutDashboard,
+//   Users,
+//   FileText,
+//   Image as ImageIcon,
+//   Settings,
+//   ClipboardList,
+//   UsersRound,
+//   Package,
+//   LogOut,
+// } from "lucide-react";
+// import {
+//   AlertDialog,
+//   AlertDialogTrigger,
+//   AlertDialogContent,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogCancel,
+//   AlertDialogAction,
+// } from "@/components/ui/alert-dialog";
+// import { useEffect, useState } from "react";
+
+// type Session = {
+//   user: {
+//     id: string;
+//     name: string;
+//     email: string;
+//     image?: string | null;
+//   };
+// };
+
+// export default function Sidebar() {
+//   const pathname = usePathname();
+//   const [user, setUser] = useState<Session["user"] | null>(null);
+
+//   const links = [
+//     { href: "/cms", label: "Dashboard", icon: LayoutDashboard },
+//     { href: "/cms/customers", label: "Customers", icon: Users },
+//     { href: "/cms/requests", label: "Requests", icon: ClipboardList },
+//     { href: "/cms/products", label: "Products", icon: Package },
+//     { href: "/cms/blog", label: "Blog Posts", icon: FileText },
+//     { href: "/cms/users", label: "Users & Roles", icon: UsersRound },
+//     { href: "/cms/gallery", label: "Gallery", icon: ImageIcon },
+//     { href: "/cms/settings", label: "Settings", icon: Settings },
+//   ];
+
+//   /* ----------  real hook  ---------- */
+//   useEffect(() => {
+//     const { data: session } = authClient.useSession(); // now a callable hook
+//     if (!session?.user?.id) return;
+
+//     getUser(session.user.id)
+//       .then((dbUser) => setUser(dbUser ?? session.user))
+//       .catch(() => setUser(session.user));
+//   }, []);
+
+//   return (
+//     <aside className="w-64 bg-black text-white flex flex-col h-full">
+//       {/* Logo */}
+//       <div className="p-4 font-bold text-lg border-b border-neutral-800 flex items-center space-x-3">
+//         <Image
+//           src={user?.image || "/images/logos/rby_color_logo.webp"}
+//           alt="RBY Logo"
+//           width={32}
+//           height={32}
+//           className="object-contain"
+//         />
+//         <div>
+//           <span>RBY LTD.</span>
+//           <p className="text-xs text-gray-400">Content Management</p>
+//         </div>
+//       </div>
+
+//       {/* Nav Links */}
+//       <nav className="flex-1 p-4 space-y-2">
+//         {links.map(({ href, label, icon: Icon }) => (
+//           <Link
+//             key={href}
+//             href={href}
+//             className={`flex items-center space-x-3 px-3 py-2 rounded-md transition ${
+//               pathname === href
+//                 ? "bg-[#be965b] text-black font-medium"
+//                 : "text-gray-300 hover:bg-neutral-800"
+//             }`}
+//           >
+//             <Icon className="h-5 w-5" />
+//             <span>{label}</span>
+//           </Link>
+//         ))}
+//       </nav>
+
+//       {/* Footer with Profile + Logout */}
+//       <div className="p-4 border-t border-neutral-800 text-sm text-gray-400 space-y-4">
+//         {/* Profile Section */}
+//         <div className="flex items-center space-x-3">
+//           {user ? (
+//             <>
+//               <Image
+//                 src={user.image || "/images/user.jpg"}
+//                 alt={user.name}
+//                 width={40}
+//                 height={40}
+//                 className="rounded-full object-cover border border-neutral-700"
+//               />
+//               <div>
+//                 <p className="font-medium text-white">{user.name}</p>
+//                 <p className="text-xs text-gray-400">{user.email}</p>
+//               </div>
+//             </>
+//           ) : (
+//             <div>
+//               <p className="font-medium text-white">Loading…</p>
+//               <p className="text-xs text-gray-400">please wait</p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Logout Button */}
+//         <AlertDialog>
+//           <AlertDialogTrigger asChild>
+//             <button className="flex items-center space-x-3 px-3 py-2 rounded-md text-red-400 hover:bg-neutral-800 hover:text-red transition w-full text-left">
+//               <LogOut className="h-5 w-5" />
+//               <span>Logout</span>
+//             </button>
+//           </AlertDialogTrigger>
+//           <AlertDialogContent>
+//             <AlertDialogHeader>
+//               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+//               <AlertDialogDescription>
+//                 You will be logged out and redirected to the homepage.
+//               </AlertDialogDescription>
+//             </AlertDialogHeader>
+//             <AlertDialogFooter>
+//               <AlertDialogCancel>Cancel</AlertDialogCancel>
+//               <AlertDialogAction
+//                 onClick={async () => {
+//                   await authClient.signOut();
+//                   window.location.href = "/";
+//                 }}
+//               >
+//                 Logout
+//               </AlertDialogAction>
+//             </AlertDialogFooter>
+//           </AlertDialogContent>
+//         </AlertDialog>
+//       </div>
+//     </aside>
+//   );
+// }
+
+
+
+
+
+
+// "use client";
+
+// import Link from "next/link";
+// import { usePathname } from "next/navigation";
+// import Image from "next/image";
+// import { authClient } from "@/lib/auth-client"; // provides useSession
+// import { getUser } from "@/app/cms/users/actions";
+// import {
+//   LayoutDashboard,
+//   Users,
+//   FileText,
+//   Image as ImageIcon,
+//   Settings,
+//   ClipboardList,
+//   UsersRound,
+//   Package,
+//   LogOut,
+// } from "lucide-react";
+// import {
+//   AlertDialog,
+//   AlertDialogTrigger,
+//   AlertDialogContent,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogCancel,
+//   AlertDialogAction,
+// } from "@/components/ui/alert-dialog";
+// import { useEffect, useState } from "react";
+
+// /* ----------  TYPES  ---------- */
+// type Session = {
+//   user: {
+//     id: string;
+//     name: string;
+//     email: string;
+//     image?: string | null;
+//   };
+// };
+
+// export default function Sidebar() {
+//   const pathname = usePathname();
+//   const [user, setUser] = useState<Session["user"] | null>(null);
+
+//   const links = [
+//     { href: "/cms", label: "Dashboard", icon: LayoutDashboard },
+//     { href: "/cms/customers", label: "Customers", icon: Users },
+//     { href: "/cms/requests", label: "Requests", icon: ClipboardList },
+//     { href: "/cms/products", label: "Products", icon: Package },
+//     { href: "/cms/blog", label: "Blog Posts", icon: FileText },
+//     { href: "/cms/users", label: "Users & Roles", icon: UsersRound },
+//     { href: "/cms/gallery", label: "Gallery", icon: ImageIcon },
+//     { href: "/cms/settings", label: "Settings", icon: Settings },
+//   ];
+
+//   /* ----------  HOOK-BASED SESSION  ---------- */
+//   useEffect(() => {
+//     const { data: session } = authClient.useSession(); // ← hook, not .session()
+//     if (!session?.user?.id) return;
+
+//     getUser(session.user.id)
+//       .then((dbUser) => setUser(dbUser ?? session.user))
+//       .catch(() => setUser(session.user));
+//   }, []);
+
+//   return (
+//     <aside className="w-64 bg-black text-white flex flex-col h-full">
+//       {/* Logo */}
+//       <div className="p-4 font-bold text-lg border-b border-neutral-800 flex items-center space-x-3">
+//         <Image
+//           src={user?.image || "/images/logos/rby_color_logo.webp"}
+//           alt="RBY Logo"
+//           width={32}
+//           height={32}
+//           className="object-contain"
+//         />
+//         <div>
+//           <span>RBY LTD.</span>
+//           <p className="text-xs text-gray-400">Content Management</p>
+//         </div>
+//       </div>
+
+//       {/* Nav Links */}
+//       <nav className="flex-1 p-4 space-y-2">
+//         {links.map(({ href, label, icon: Icon }) => (
+//           <Link
+//             key={href}
+//             href={href}
+//             className={`flex items-center space-x-3 px-3 py-2 rounded-md transition ${
+//               pathname === href
+//                 ? "bg-[#be965b] text-black font-medium"
+//                 : "text-gray-300 hover:bg-neutral-800"
+//             }`}
+//           >
+//             <Icon className="h-5 w-5" />
+//             <span>{label}</span>
+//           </Link>
+//         ))}
+//       </nav>
+
+//       {/* Footer with Profile + Logout */}
+//       <div className="p-4 border-t border-neutral-800 text-sm text-gray-400 space-y-4">
+//         {/* Profile Section */}
+//         <div className="flex items-center space-x-3">
+//           {user ? (
+//             <>
+//               <Image
+//                 src={user.image || "/images/user.jpg"}
+//                 alt={user.name}
+//                 width={40}
+//                 height={40}
+//                 className="rounded-full object-cover border border-neutral-700"
+//               />
+//               <div>
+//                 <p className="font-medium text-white">{user.name}</p>
+//                 <p className="text-xs text-gray-400">{user.email}</p>
+//               </div>
+//             </>
+//           ) : (
+//             <div>
+//               <p className="font-medium text-white">Loading…</p>
+//               <p className="text-xs text-gray-400">please wait</p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Logout Button */}
+//         <AlertDialog>
+//           <AlertDialogTrigger asChild>
+//             <button className="flex items-center space-x-3 px-3 py-2 rounded-md text-red-400 hover:bg-neutral-800 hover:text-red transition w-full text-left">
+//               <LogOut className="h-5 w-5" />
+//               <span>Logout</span>
+//             </button>
+//           </AlertDialogTrigger>
+//           <AlertDialogContent>
+//             <AlertDialogHeader>
+//               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+//               <AlertDialogDescription>
+//                 You will be logged out and redirected to the homepage.
+//               </AlertDialogDescription>
+//             </AlertDialogHeader>
+//             <AlertDialogFooter>
+//               <AlertDialogCancel>Cancel</AlertDialogCancel>
+//               <AlertDialogAction
+//                 onClick={async () => {
+//                   await authClient.signOut();
+//                   window.location.href = "/";
+//                 }}
+//               >
+//                 Logout
+//               </AlertDialogAction>
+//             </AlertDialogFooter>
+//           </AlertDialogContent>
+//         </AlertDialog>
+//       </div>
+//     </aside>
+//   );
+// }
+
+
+
+
+
+
+
+// "use client";
+
+// import Link from "next/link";
+// import { usePathname } from "next/navigation";
+// import Image from "next/image";
+// import { authClient } from "@/lib/auth-client";
+// import { getUser } from "@/app/cms/users/actions";
+// import {
+//   LayoutDashboard,
+//   Users,
+//   FileText,
+//   Image as ImageIcon,
+//   Settings,
+//   ClipboardList,
+//   UsersRound,
+//   Package,
+//   LogOut,
+// } from "lucide-react";
+// import {
+//   AlertDialog,
+//   AlertDialogTrigger,
+//   AlertDialogContent,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogCancel,
+//   AlertDialogAction,
+// } from "@/components/ui/alert-dialog";
+// import { useEffect, useState } from "react";
+
+// type User = {
+//   id: string;
+//   name: string;
+//   email: string;
+//   image?: string | null;
+// };
+
+// export default function Sidebar() {
+//   const pathname = usePathname();
+//   const [user, setUser] = useState<User | null>(null);
+
+//   const links = [
+//     { href: "/cms", label: "Dashboard", icon: LayoutDashboard },
+//     { href: "/cms/customers", label: "Customers", icon: Users },
+//     { href: "/cms/requests", label: "Requests", icon: ClipboardList },
+//     { href: "/cms/products", label: "Products", icon: Package },
+//     { href: "/cms/blog", label: "Blog Posts", icon: FileText },
+//     { href: "/cms/users", label: "Users & Roles", icon: UsersRound },
+//     { href: "/cms/gallery", label: "Gallery", icon: ImageIcon },
+//     { href: "/cms/settings", label: "Settings", icon: Settings },
+//   ];
+
+//   useEffect(() => {
+//     authClient.session().then(async (session) => {
+//       if (!session?.user?.id) return;
+
+//       try {
+//         const dbUser = await getUser(session.user.id);
+//         setUser(dbUser || session.user);
+//       } catch (err) {
+//         console.error("getUser failed:", err);
+//         setUser(session.user as User);
+//       }
+//     });
+//   }, []);
+
+//   return (
+//     <aside className="w-64 bg-black text-white flex flex-col h-full">
+//       {/* Logo */}
+//       <div className="p-4 font-bold text-lg border-b border-neutral-800 flex items-center space-x-3">
+//         <Image
+//           src={user?.image || "/images/logos/rby_color_logo.webp"}
+//           alt="RBY Logo"
+//           width={32}
+//           height={32}
+//           className="object-contain"
+//         />
+//         <div>
+//           <span>RBY LTD.</span>
+//           <p className="text-xs text-gray-400">Content Management</p>
+//         </div>
+//       </div>
+
+//       {/* Nav Links */}
+//       <nav className="flex-1 p-4 space-y-2">
+//         {links.map(({ href, label, icon: Icon }) => (
+//           <Link
+//             key={href}
+//             href={href}
+//             className={`flex items-center space-x-3 px-3 py-2 rounded-md transition ${
+//               pathname === href
+//                 ? "bg-[#be965b] text-black font-medium"
+//                 : "text-gray-300 hover:bg-neutral-800"
+//             }`}
+//           >
+//             <Icon className="h-5 w-5" />
+//             <span>{label}</span>
+//           </Link>
+//         ))}
+//       </nav>
+
+//       {/* Footer with Profile + Logout */}
+//       <div className="p-4 border-t border-neutral-800 text-sm text-gray-400 space-y-4">
+//         {/* Profile Section */}
+//         <div className="flex items-center space-x-3">
+//           {user ? (
+//             <>
+//               <Image
+//                 src={user.image || "/images/user.jpg"}
+//                 alt={user.name}
+//                 width={40}
+//                 height={40}
+//                 className="rounded-full object-cover border border-neutral-700"
+//               />
+//               <div>
+//                 <p className="font-medium text-white">{user.name}</p>
+//                 <p className="text-xs text-gray-400">{user.email}</p>
+//               </div>
+//             </>
+//           ) : (
+//             <div>
+//               <p className="font-medium text-white">Loading…</p>
+//               <p className="text-xs text-gray-400">please wait</p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Logout Button */}
+//         <AlertDialog>
+//           <AlertDialogTrigger asChild>
+//             <button className="flex items-center space-x-3 px-3 py-2 rounded-md text-red-400 hover:bg-neutral-800 hover:text-red transition w-full text-left">
+//               <LogOut className="h-5 w-5" />
+//               <span>Logout</span>
+//             </button>
+//           </AlertDialogTrigger>
+//           <AlertDialogContent>
+//             <AlertDialogHeader>
+//               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+//               <AlertDialogDescription>
+//                 You will be logged out and redirected to the homepage.
+//               </AlertDialogDescription>
+//             </AlertDialogHeader>
+//             <AlertDialogFooter>
+//               <AlertDialogCancel>Cancel</AlertDialogCancel>
+//               <AlertDialogAction
+//                 onClick={async () => {
+//                   await authClient.signOut();
+//                   window.location.href = "/";
+//                 }}
+//               >
+//                 Logout
+//               </AlertDialogAction>
+//             </AlertDialogFooter>
+//           </AlertDialogContent>
+//         </AlertDialog>
+//       </div>
+//     </aside>
+//   );
+// }
+
+
+
+
+
+
+// "use client";
+
+// import Link from "next/link";
+// import { usePathname } from "next/navigation";
+// import Image from "next/image";
+// import { authClient } from "@/lib/auth-client";
+// import { getUser } from "@/app/cms/users/actions";
+// import {
+//   LayoutDashboard,
+//   Users,
+//   FileText,
+//   Image as ImageIcon,
+//   Settings,
+//   ClipboardList,
+//   UsersRound,
+//   Package,
+//   LogOut,
+// } from "lucide-react";
+// import {
+//   AlertDialog,
+//   AlertDialogTrigger,
+//   AlertDialogContent,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogCancel,
+//   AlertDialogAction,
+// } from "@/components/ui/alert-dialog";
+// import { useEffect, useState } from "react";
+
+// type User = {
+//   id: string;
+//   name: string;
+//   email: string;
+//   image?: string | null;
+// };
+
+// export default function Sidebar() {
+//   const pathname = usePathname();
+//   const [user, setUser] = useState<User | null>(null);
+
+//   const links = [
+//     { href: "/cms", label: "Dashboard", icon: LayoutDashboard },
+//     { href: "/cms/customers", label: "Customers", icon: Users },
+//     { href: "/cms/requests", label: "Requests", icon: ClipboardList },
+//     { href: "/cms/products", label: "Products", icon: Package },
+//     { href: "/cms/blog", label: "Blog Posts", icon: FileText },
+//     { href: "/cms/users", label: "Users & Roles", icon: UsersRound },
+//     { href: "/cms/gallery", label: "Gallery", icon: ImageIcon },
+//     { href: "/cms/settings", label: "Settings", icon: Settings },
+//   ];
+
+//   useEffect(() => {
+//     authClient.session().then(async (session) => {
+//       if (!session?.user?.id) return;
+
+//       try {
+//         const dbUser = await getUser(session.user.id);
+//         setUser(dbUser || session.user);
+//       } catch (err) {
+//         console.error("getUser failed:", err);
+//         setUser(session.user as User);
+//       }
+//     });
+//   }, []);
+
+//   return (
+//     <aside className="w-64 bg-black text-white flex flex-col h-full">
+//       {/* Logo */}
+//       <div className="p-4 font-bold text-lg border-b border-neutral-800 flex items-center space-x-3">
+//         <Image
+//           src={user?.image || "/images/logos/rby_color_logo.webp"}
+//           alt="RBY Logo"
+//           width={32}
+//           height={32}
+//           className="object-contain"
+//         />
+//         <div>
+//           <span>RBY LTD.</span>
+//           <p className="text-xs text-gray-400">Content Management</p>
+//         </div>
+//       </div>
+
+//       {/* Nav Links */}
+//       <nav className="flex-1 p-4 space-y-2">
+//         {links.map(({ href, label, icon: Icon }) => (
+//           <Link
+//             key={href}
+//             href={href}
+//             className={`flex items-center space-x-3 px-3 py-2 rounded-md transition ${
+//               pathname === href
+//                 ? "bg-[#be965b] text-black font-medium"
+//                 : "text-gray-300 hover:bg-neutral-800"
+//             }`}
+//           >
+//             <Icon className="h-5 w-5" />
+//             <span>{label}</span>
+//           </Link>
+//         ))}
+//       </nav>
+
+//       {/* Footer with Profile + Logout */}
+//       <div className="p-4 border-t border-neutral-800 text-sm text-gray-400 space-y-4">
+//         {/* Profile Section */}
+//         <div className="flex items-center space-x-3">
+//           {user ? (
+//             <>
+//               <Image
+//                 src={user.image || "/images/user.jpg"}
+//                 alt={user.name}
+//                 width={40}
+//                 height={40}
+//                 className="rounded-full object-cover border border-neutral-700"
+//               />
+//               <div>
+//                 <p className="font-medium text-white">{user.name}</p>
+//                 <p className="text-xs text-gray-400">{user.email}</p>
+//               </div>
+//             </>
+//           ) : (
+//             <div>
+//               <p className="font-medium text-white">Loading…</p>
+//               <p className="text-xs text-gray-400">please wait</p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Logout Button */}
+//         <AlertDialog>
+//           <AlertDialogTrigger asChild>
+//             <button className="flex items-center space-x-3 px-3 py-2 rounded-md text-red-400 hover:bg-neutral-800 hover:text-red transition w-full text-left">
+//               <LogOut className="h-5 w-5" />
+//               <span>Logout</span>
+//             </button>
+//           </AlertDialogTrigger>
+//           <AlertDialogContent>
+//             <AlertDialogHeader>
+//               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+//               <AlertDialogDescription>
+//                 You will be logged out and redirected to the homepage.
+//               </AlertDialogDescription>
+//             </AlertDialogHeader>
+//             <AlertDialogFooter>
+//               <AlertDialogCancel>Cancel</AlertDialogCancel>
+//               <AlertDialogAction
+//                 onClick={async () => {
+//                   await new authClient().signOut();
+//                   window.location.href = "/";
+//                 }}
+//               >
+//                 Logout
+//               </AlertDialogAction>
+//             </AlertDialogFooter>
+//           </AlertDialogContent>
+//         </AlertDialog>
+//       </div>
+//     </aside>
+//   );
+// }
 
 
 

@@ -3,13 +3,13 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
-import { IdleLogout } from "./components/IdleLogout"; // client-side idle timer
+import { IdleLogout } from "./components/IdleLogout";
 
 export default async function CmsLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
-  const session = await auth.api.getSession({
-    headers: { cookie: cookieStore.toString() },
-  });
+  const headers = new Headers({ cookie: cookieStore.toString() });
+
+  const session = await auth.api.getSession({ headers });
 
   if (!session) redirect("/login");
 
@@ -19,13 +19,45 @@ export default async function CmsLayout({ children }: { children: React.ReactNod
       <div className="flex-1 flex flex-col">
         <Header />
         <main className="flex-1 p-6 overflow-y-auto">
-          <IdleLogout /> {/* auto-logout after idle */}
+          <IdleLogout />
           {children}
         </main>
       </div>
     </div>
   );
 }
+
+
+
+
+// import { cookies } from "next/headers";
+// import { auth } from "@/lib/auth";
+// import { redirect } from "next/navigation";
+// import Sidebar from "./components/Sidebar";
+// import Header from "./components/Header";
+// import { IdleLogout } from "./components/IdleLogout"; // client-side idle timer
+
+// export default async function CmsLayout({ children }: { children: React.ReactNode }) {
+//   const cookieStore = await cookies();
+//   const session = await auth.api.getSession({
+//     headers: { cookie: cookieStore.toString() },
+//   });
+
+//   if (!session) redirect("/login");
+
+//   return (
+//     <div className="flex h-screen bg-[#faf9f6]">
+//       <Sidebar />
+//       <div className="flex-1 flex flex-col">
+//         <Header />
+//         <main className="flex-1 p-6 overflow-y-auto">
+//           <IdleLogout /> {/* auto-logout after idle */}
+//           {children}
+//         </main>
+//       </div>
+//     </div>
+//   );
+// }
 
 
 

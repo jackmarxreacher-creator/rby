@@ -1,5 +1,10 @@
+// COMMENTED OUT ORIGINAL CODE WITH UNUSED IMPORT
+// import Image from "next/image";
+// import styles from "./page.module.css";
+// import { blogPosts } from "@/data/blogPosts";
+
+// FIXED VERSION - REMOVED UNUSED STYLES IMPORT
 import Image from "next/image";
-import styles from "./page.module.css";
 import { blogPosts } from "@/data/blogPosts";
 import Hero from "@/app/sections/Hero";
 import Welcome from "./sections/Welcome";

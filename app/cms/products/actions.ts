@@ -1,9 +1,19 @@
+// COMMENTED OUT ORIGINAL CODE WITH TYPESCRIPT ERRORS
+// "use server";
+// import fs from "fs/promises";
+// import path from "path";
+// import { randomUUID } from "crypto";
+// import { revalidatePath } from "next/cache";
+// import { prisma } from "@/lib/prisma";
+
+// FIXED VERSION WITH PROPER ENUM HANDLING
 "use server";
 import fs from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { Category } from "@prisma/client";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "images", "new_products");
 
@@ -25,7 +35,7 @@ export async function createProduct(data: FormData) {
   await prisma.product.create({
     data: {
       name: data.get("name") as string,
-      category: data.get("category") as string,
+      category: data.get("category") as Category,
       size: data.get("size") as string,
       wholesalePrice: Number(data.get("wholesalePrice")),
       retailPrice: Number(data.get("retailPrice")),
@@ -43,7 +53,7 @@ export async function updateProduct(id: string, data: FormData) {
     where: { id },
     data: {
       name: data.get("name") as string,
-      category: data.get("category") as string,
+      category: data.get("category") as Category,
       size: data.get("size") as string,
       wholesalePrice: Number(data.get("wholesalePrice")),
       retailPrice: Number(data.get("retailPrice")),

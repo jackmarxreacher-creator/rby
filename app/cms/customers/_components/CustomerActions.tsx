@@ -57,8 +57,8 @@ export function CustomerActions({ customer }: { customer: any }) {
             </Button>
             <Button
               size="sm"
-              variant="destructive"
-              className="bg-[#7b2e2e] hover:bg-[#7b2e2e]/80"
+              variant="outline"
+              className="bg-red-600 hover:bg-red-700 text-white border-red-600"
               onClick={handleDelete}
             >
               Delete

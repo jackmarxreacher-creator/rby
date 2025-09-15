@@ -28,25 +28,25 @@ export const blogPosts = [
   {
     title: 'RBY Celebrates 10 Years in Distribution',
     excerpt: 'A decade of excellence in distributing Guinness across Ghana. See our journey...',
-    image: '/images/blog/10-years-celebration.jpg',
+    image: '/images/blog/10-years-celebration.webp',
     slug: '10-years-in-distribution',
   },
   {
     title: 'Tips for Retailers: Boost Guinness Sales',
     excerpt: 'Discover how to increase Guinness sales in your store with these expert tips...',
-    image: '/images/blog/sales-tips.jpg',
+    image: '/images/blog/sales-tips.webp',
     slug: 'boost-guinness-sales',
   },
   {
     title: 'Meet the RBY Sales Team',
     excerpt: 'Get to know the powerhouse team driving our distribution success...',
-    image: '/images/blog/meet-sales-team.jpg',
+    image: '/images/blog/meet-sales-team.webp',
     slug: 'rby-sales-team',
   },
   {
     title: 'New Warehouse Launch in Tamale',
     excerpt: 'We’ve expanded! Take a look at our new state-of-the-art warehouse...',
-    image: '/images/blog/new-warehouse-tamale.jpg',
+    image: '/images/blog/new-warehouse-tamale.webp',
     slug: 'warehouse-launch-tamale',
   },
   {

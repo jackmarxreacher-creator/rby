@@ -50,7 +50,7 @@ export default function OrderForm({
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [address, setAddress] = useState("");
-  const [businessType, setBusinessType] = useState<"Wholesale" | "Retail" | "">("");
+  const [businessType, setBusinessType] = useState<"Wholesale" | "Retail">("Wholesale");
 
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -86,7 +86,8 @@ export default function OrderForm({
       setPhone(initialCustomer.phone ?? "");
       setLocation(initialCustomer.location ?? "");
       setAddress(initialCustomer.address ?? "");
-      setBusinessType(initialCustomer.businessType ?? "");
+      // FIXED: Handle businessType - already in correct format
+      setBusinessType(initialCustomer.businessType || "Wholesale");
     }
   }, [initialRequest, initialCustomer]);
 
@@ -94,7 +95,7 @@ export default function OrderForm({
     customerName.trim() !== "" &&
     email.trim() !== "" &&
     phone.trim() !== "" &&
-    businessType !== "";
+    businessType === "Wholesale" || businessType === "Retail";
 
   const canSubmit = allRequiredFilled && invoiceItems.length > 0;
 
@@ -215,7 +216,7 @@ export default function OrderForm({
             <select
               value={businessType}
               onChange={(e) =>
-                setBusinessType(e.target.value as "Wholesale" | "Retail" | "")
+                setBusinessType(e.target.value as "Wholesale" | "Retail")
               }
               className="w-full border rounded px-3 py-2 text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#be965b]"
               required
@@ -313,7 +314,6 @@ export default function OrderForm({
           onClose={() => setDialogOpen(false)}
           onAddProduct={handleAddProduct}
           businessType={businessType}
-          products={products}
         />
 
         {/* Invoice Summary */}
@@ -392,8 +392,9 @@ export default function OrderForm({
                         )}
                         <Button
                           type="button"
-                          variant="destructive"
+                          variant="outline"
                           size="sm"
+                          className="bg-red-600 hover:bg-red-700 text-white border-red-600"
                           onClick={() => handleDelete(index)}
                         >
                           Delete
