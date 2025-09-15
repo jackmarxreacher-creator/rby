@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const cors = async (req: NextRequest, res: NextResponse) => {
+export const cors = (req: NextRequest, res: NextResponse, next: () => void) => {
   res.headers.set('Access-Control-Allow-Origin', '*');
   res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -9,8 +9,25 @@ export const cors = async (req: NextRequest, res: NextResponse) => {
     return new NextResponse(null, { status: 204 });
   }
 
-  return null; // Return null if not an OPTIONS request
+  next();
 };
+
+
+
+
+// import { NextRequest, NextResponse } from 'next/server';
+
+// export const cors = async (req: NextRequest, res: NextResponse) => {
+//   res.headers.set('Access-Control-Allow-Origin', '*');
+//   res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+//   res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+//   if (req.method === 'OPTIONS') {
+//     return new NextResponse(null, { status: 204 });
+//   }
+
+//   return null; // Return null if not an OPTIONS request
+// };
 
 
 
