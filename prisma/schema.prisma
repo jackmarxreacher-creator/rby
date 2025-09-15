@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")      // Prisma Accelerate (pooled)
+  directUrl = env("DIRECT_URL")        // Raw TCP for migrate / seed
 }
 
 model User {
@@ -20,73 +21,70 @@ model User {
   accounts      Account[]
   sessions      Session[]
 
-  // Relations for audit fields on orders
-  createdOrders  Order[] @relation("OrderCreatedBy")
-  editedOrders   Order[] @relation("OrderEditedBy")
+  createdOrders   Order[] @relation("OrderCreatedBy")
+  editedOrders    Order[] @relation("OrderEditedBy")
   processedOrders Order[] @relation("OrderProcessedBy")
 
-  // Relations for audit fields on gallery items
   createdGalleryItems GalleryItem[] @relation("CreatedByGalleryItems")
   updatedGalleryItems GalleryItem[] @relation("UpdatedByGalleryItems")
   deletedGalleryItems GalleryItem[] @relation("DeletedByGalleryItems")
 }
 
 model Customer {
-  id           String   @id @default(cuid())
+  id           String        @id @default(cuid())
   name         String
   businessName String?
   businessType BusinessType
-  email        String   @unique
+  email        String        @unique
   phone        String
   location     String?
   address      String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   orders       Order[]
 }
 
 model Order {
-  id           String    @id @default(cuid())
-  customerId   String
-  customer     Customer  @relation(fields: [customerId], references: [id])
-  status       OrderStatus @default(RECEIVED)
-  totalAmount  Float
+  id            String      @id @default(cuid())
+  customerId    String
+  customer      Customer    @relation(fields: [customerId], references: [id])
+  status        OrderStatus @default(RECEIVED)
+  totalAmount   Float
 
-  // Audit trail fields - references to User who performed actions
   createdById   String?
-  createdBy     User?     @relation("OrderCreatedBy", fields: [createdById], references: [id])
+  createdBy     User?       @relation("OrderCreatedBy", fields: [createdById], references: [id])
   editedById    String?
-  editedBy      User?     @relation("OrderEditedBy", fields: [editedById], references: [id])
+  editedBy      User?       @relation("OrderEditedBy", fields: [editedById], references: [id])
   processedById String?
-  processedBy   User?     @relation("OrderProcessedBy", fields: [processedById], references: [id])
+  processedBy   User?       @relation("OrderProcessedBy", fields: [processedById], references: [id])
 
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
   orderItems   OrderItem[]
 }
 
 model OrderItem {
-  id         String  @id @default(cuid())
-  orderId    String
-  order      Order   @relation(fields: [orderId], references: [id])
-  productId  String
-  product    Product @relation(fields: [productId], references: [id])
-  quantity   Int
-  price      Float   // Price at time of order (wholesale or retail)
-  amount     Float   // price * quantity
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float // Price at time of order (wholesale or retail)
+  amount    Float // price * quantity
 }
 
 model Product {
-  id             String   @id @default(cuid())
+  id             String     @id @default(cuid())
   name           String
   image          String?
   size           String
   wholesalePrice Int
   retailPrice    Int
   description    String?
-  discount       Int?     @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  discount       Int?       @default(0)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
   category       Category
   orderItems     OrderItem[]
 }
