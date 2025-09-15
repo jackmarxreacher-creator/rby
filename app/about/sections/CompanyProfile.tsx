@@ -18,7 +18,7 @@ export default function CompanyProfile() {
                 Our Story
             </h2>
             <p className="text-gray-700 text-base md:text-lg leading-relaxed mb-4">
-                Ricky Boakye Yiadom Ltd stands as a testament to entrepreneurial vision, steady growth, and an unwavering commitment to excellence in beverage distribution across Ghana’s Ashanti Region. What began as a modest venture has evolved into one of the region's most trusted distribution partners.
+                Ricky Boakye Yiadom Ltd stands as a testament to entrepreneurial vision, steady growth, and an unwavering commitment to excellence in beverage distribution across Ghana`s Ashanti Region. What began as a modest venture has evolved into one of the region's most trusted distribution partners.
             </p>
             <h3 className="text-xl md:text-xl font-bold text-[#be965b] my-3">
                 Our Heritage
@@ -63,7 +63,7 @@ export default function CompanyProfile() {
                 Our Partnership
             </h3>
             <p className="text-gray-700  text-base md:text-lg leading-relaxed">
-              We are proud to serve as a Key Distributor for Guinness Ghana Breweries PLC, one of Ghana’s most respected beverage companies. For the past 39 years, Ricky Boakye Yiadom Ltd has exclusively distributed Guinness products, making us the longest-serving distributor for Guinness Ghana. This remarkable partnership spans nearly four decades and reflects our proven track record in distribution excellence, market knowledge, and an unwavering commitment to maintaining the highest standards of product quality and customer service.    
+              We are proud to serve as a Key Distributor for Guinness Ghana Breweries PLC, one of Ghana`s most respected beverage companies. For the past 39 years, Ricky Boakye Yiadom Ltd has exclusively distributed Guinness products, making us the longest-serving distributor for Guinness Ghana. This remarkable partnership spans nearly four decades and reflects our proven track record in distribution excellence, market knowledge, and an unwavering commitment to maintaining the highest standards of product quality and customer service.    
             </p>
           </div>
           </motion.div>
