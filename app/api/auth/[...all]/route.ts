@@ -3,16 +3,41 @@ import { cors } from '@/lib/cors'; // Import the updated CORS middleware
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
-  await cors(req, new NextResponse(), async () => {
-    return auth.handler(req);
-  });
+  // Apply CORS middleware
+  const response = await cors(req, new NextResponse(null, { status: 200 }));
+  if (response) return response;
+
+  // Call the auth handler
+  return auth.handler(req);
 }
 
 export async function POST(req: NextRequest) {
-  await cors(req, new NextResponse(), async () => {
-    return auth.handler(req);
-  });
+  // Apply CORS middleware
+  const response = await cors(req, new NextResponse(null, { status: 200 }));
+  if (response) return response;
+
+  // Call the auth handler
+  return auth.handler(req);
 }
+
+
+
+
+// import { auth } from '@/lib/auth';
+// import { cors } from '@/lib/cors'; // Import the updated CORS middleware
+// import { NextRequest, NextResponse } from 'next/server';
+
+// export async function GET(req: NextRequest) {
+//   await cors(req, new NextResponse(), async () => {
+//     return auth.handler(req);
+//   });
+// }
+
+// export async function POST(req: NextRequest) {
+//   await cors(req, new NextResponse(), async () => {
+//     return auth.handler(req);
+//   });
+// }
 
 
 
