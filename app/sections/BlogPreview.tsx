@@ -20,13 +20,13 @@ export default function BlogPreview({
   isLoading?: boolean;
 }) {
   return (
-    <section className="py-16 px-4 md:px-8 bg-[#fcfbf8]">
+    <section className="py-16 px-4 sm:px-6 md:px-8 bg-[#fcfbf8]">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-[#be965b] mb-10 text-center">
           Latest News & Insights
         </h2>
 
-        <div className="grid grid-cols-1 px-18 sm:px-8 m:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 px-18 m:grid-cols-2 lg:grid-cols-3 gap-8">
           {isLoading ? (
             Array.from({ length: 3 }).map((_, index) => (
               <div
