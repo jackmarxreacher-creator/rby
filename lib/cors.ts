@@ -1,16 +1,40 @@
+// lib/cors.ts
 import { NextRequest, NextResponse } from 'next/server';
 
-export const cors = (req: NextRequest, res: NextResponse, next: () => void) => {
-  res.headers.set('Access-Control-Allow-Origin', '*');
-  res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
+/**
+ * Adds CORS headers and immediately replies 204 to OPTIONS.
+ * Returns the 204 response for OPTIONS, or null for normal requests.
+ */
+export function cors(req: NextRequest): NextResponse | null {
   if (req.method === 'OPTIONS') {
-    return new NextResponse(null, { status: 204 });
+    return new NextResponse(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    });
   }
+  return null; // continue normal flow
+}
 
-  next();
-};
+
+
+
+// import { NextRequest, NextResponse } from 'next/server';
+
+// export const cors = (req: NextRequest, res: NextResponse, next: () => void) => {
+//   res.headers.set('Access-Control-Allow-Origin', '*');
+//   res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+//   res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+//   if (req.method === 'OPTIONS') {
+//     return new NextResponse(null, { status: 204 });
+//   }
+
+//   next();
+// };
 
 
 
