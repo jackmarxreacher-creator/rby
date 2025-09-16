@@ -8,7 +8,7 @@ import Image from 'next/image';
 
 export default function Intro() {
   return (
-    <section className="bg-[#fcfbf8] py-16 px-4 md:px-12 sm:px-6">
+    <section className="bg-[#fcfbf8] py-16 px-4 md:px-12 sm:px-3">
       <div className="max-w-7xl mx-auto grid px-18 grid-cols-1 md:grid-cols-2 gap-12 items-center">
         {/* Text Section */}
         <motion.div
@@ -20,7 +20,7 @@ export default function Intro() {
           <h2 className="text-3xl md:text-4xl font-bold text-[#be965b]">
             About Us
           </h2>
-          <p className="text-base text-gray-700 text-justify sm:text-left eading-relaxed">
+          <p className="text-base text-gray-700 text-justify sm:text-left eading-relaxed sm:px-5">
             Founded in August 1986 by visionary entrepreneur Kofi Boakye Yiadom, our company started its journey from a single store in Atonsu with a simple mission: to provide quality beverages to our community with exceptional service. Mr. Yiadom's dedication to customer satisfaction and business excellence laid the foundation for what would become a thriving enterprise.
             In July 2016, marking a significant milestone in our growth trajectory, we transitioned from a sole proprietorship to a limited liability company, formalizing our commitment to professional business practices and sustainable growth.
           </p>
