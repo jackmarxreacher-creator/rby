@@ -1,18 +1,50 @@
+// app/api/auth/[...all]/route.ts
 import { auth } from '@/lib/auth';
-import { cors } from '@/lib/cors';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
-  await cors(req, new NextResponse(), async () => {
-    return auth.handler(req);
+/*  reply to OPTIONS immediately with CORS headers  */
+function preflight(req: NextRequest) {
+  if (req.method !== 'OPTIONS') return null;
+
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin':  '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
   });
+}
+
+export async function GET(req: NextRequest) {
+  const res = preflight(req);
+  if (res) return res;
+  return auth.handler(req);
 }
 
 export async function POST(req: NextRequest) {
-  await cors(req, new NextResponse(), async () => {
-    return auth.handler(req);
-  });
+  const res = preflight(req);
+  if (res) return res;
+  return auth.handler(req);
 }
+
+
+
+// import { auth } from '@/lib/auth';
+// import { cors } from '@/lib/cors';
+// import { NextRequest, NextResponse } from 'next/server';
+
+// export async function GET(req: NextRequest) {
+//   await cors(req, new NextResponse(), async () => {
+//     return auth.handler(req);
+//   });
+// }
+
+// export async function POST(req: NextRequest) {
+//   await cors(req, new NextResponse(), async () => {
+//     return auth.handler(req);
+//   });
+// }
 
 
 

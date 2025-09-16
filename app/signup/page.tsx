@@ -1,4 +1,151 @@
-// COMMENTED OUT ORIGINAL CODE WITH TYPESCRIPT ERROR
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+export default function RegisterPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("admin@rby.com");
+  const [password, setPassword] = useState("ChangeMe!123");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [role, setRole] = useState<"ADMIN" | "EDITOR" | "VIEWER">("ADMIN");
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(null);
+    setLoading(true);
+
+    // 1. phoneNumber is NOT accepted by signUp.email()
+    const { data, error } = await authClient.signUp.email({
+      email,
+      password,
+      name,
+      // image, callbackURL, fetchOptions are the only other allowed fields
+    });
+
+    if (error) {
+      setErr(error.message || "Sign up failed");
+    } else {
+      // 2. There is NO client-side organisation role setter.
+      //    Set the role server-side (hook / admin panel) instead.
+      console.log(`User created → id: ${data.user.id}`);
+      router.push("/login");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#faf9f6]">
+      <Card className="w-full max-w-md border border-gray-200 shadow-lg">
+        <CardHeader className="text-center">
+          <CardTitle className="text-xl font-bold text-gray-800">
+            Create Account
+          </CardTitle>
+          <CardDescription>
+            Enter your details to get started.
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name */}
+            <div className="space-y-1">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+
+            {/* Email */}
+            <div className="space-y-1">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            {/* Password */}
+            <div className="space-y-1">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            {/* Phone Number (optional - NOT sent to API) */}
+            <div className="space-y-1">
+              <Label htmlFor="phone">Phone Number (optional)</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+            </div>
+
+            {/* Role selector (for display only) */}
+            <div className="space-y-1">
+              <Label htmlFor="role">Role</Label>
+              <select
+                id="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value as any)}
+                className="w-full border border-gray-300 rounded-md px-3 py-2"
+              >
+                <option value="VIEWER">Viewer</option>
+                <option value="EDITOR">Editor</option>
+                <option value="ADMIN">Admin</option>
+              </select>
+            </div>
+
+            {/* Error */}
+            {err && <p className="text-sm text-red-500">{err}</p>}
+
+            {/* Submit */}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#be965b] hover:bg-yellow-600 text-white"
+            >
+              {loading ? "Creating..." : "Create Account"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+
+
+
+
+//COMMENTED OUT ORIGINAL CODE WITH TYPESCRIPT ERROR
 // "use client";
 
 // import { useState } from "react";
@@ -146,147 +293,147 @@
 // }
 
 // FIXED VERSION - REMOVED ORGANIZATION PROPERTY ERROR
-"use client";
+// "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+// import { useState } from "react";
+// import { useRouter } from "next/navigation";
+// import { authClient } from "@/lib/auth-client";
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardHeader,
+//   CardTitle,
+// } from "@/components/ui/card";
+// import { Label } from "@/components/ui/label";
+// import { Input } from "@/components/ui/input";
+// import { Button } from "@/components/ui/button";
 
-export default function RegisterPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("admin@rby.com");
-  const [password, setPassword] = useState("ChangeMe!123");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [role, setRole] = useState<"ADMIN" | "EDITOR" | "VIEWER">("ADMIN");
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-  const router = useRouter();
+// export default function RegisterPage() {
+//   const [name, setName] = useState("");
+//   const [email, setEmail] = useState("admin@rby.com");
+//   const [password, setPassword] = useState("ChangeMe!123");
+//   const [phoneNumber, setPhoneNumber] = useState("");
+//   const [role, setRole] = useState<"ADMIN" | "EDITOR" | "VIEWER">("ADMIN");
+//   const [loading, setLoading] = useState(false);
+//   const [err, setErr] = useState<string | null>(null);
+//   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErr(null);
-    setLoading(true);
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     setErr(null);
+//     setLoading(true);
 
-    const { data, error } = await authClient.signUp.email({
-      email,
-      password,
-      name,
-      // FIXED: Removed phoneNumber as it's not supported in signUp.email
-    });
+//     const { data, error } = await authClient.signUp.email({
+//       email,
+//       password,
+//       name,
+//       // FIXED: Removed phoneNumber as it's not supported in signUp.email
+//     });
 
-    if (error) {
-      setErr(error.message || "Sign up failed");
-    } else {
-      // FIXED: Removed organization.updateMemberRole call that doesn't exist
-      // Role assignment should be handled server-side or via admin panel
-      console.log(`User created with role: ${role}`);
-      router.push("/login");
-    }
-    setLoading(false);
-  };
+//     if (error) {
+//       setErr(error.message || "Sign up failed");
+//     } else {
+//       // FIXED: Removed organization.updateMemberRole call that doesn't exist
+//       // Role assignment should be handled server-side or via admin panel
+//       console.log(`User created with role: ${role}`);
+//       router.push("/login");
+//     }
+//     setLoading(false);
+//   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[#faf9f6]">
-      <Card className="w-full max-w-md border border-gray-200 shadow-lg">
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl font-bold text-gray-800">
-            Create Account
-          </CardTitle>
-          <CardDescription>
-            Enter your details to get started.
-          </CardDescription>
-        </CardHeader>
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-[#faf9f6]">
+//       <Card className="w-full max-w-md border border-gray-200 shadow-lg">
+//         <CardHeader className="text-center">
+//           <CardTitle className="text-xl font-bold text-gray-800">
+//             Create Account
+//           </CardTitle>
+//           <CardDescription>
+//             Enter your details to get started.
+//           </CardDescription>
+//         </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Name */}
-            <div className="space-y-1">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
+//         <CardContent>
+//           <form onSubmit={handleSubmit} className="space-y-4">
+//             {/* Name */}
+//             <div className="space-y-1">
+//               <Label htmlFor="name">Name</Label>
+//               <Input
+//                 id="name"
+//                 required
+//                 value={name}
+//                 onChange={(e) => setName(e.target.value)}
+//               />
+//             </div>
 
-            {/* Email */}
-            <div className="space-y-1">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
+//             {/* Email */}
+//             <div className="space-y-1">
+//               <Label htmlFor="email">Email</Label>
+//               <Input
+//                 id="email"
+//                 type="email"
+//                 required
+//                 value={email}
+//                 onChange={(e) => setEmail(e.target.value)}
+//               />
+//             </div>
 
-            {/* Password */}
-            <div className="space-y-1">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+//             {/* Password */}
+//             <div className="space-y-1">
+//               <Label htmlFor="password">Password</Label>
+//               <Input
+//                 id="password"
+//                 type="password"
+//                 required
+//                 value={password}
+//                 onChange={(e) => setPassword(e.target.value)}
+//               />
+//             </div>
 
-            {/* Phone Number (optional) */}
-            <div className="space-y-1">
-              <Label htmlFor="phone">Phone Number (optional)</Label>
-              <Input
-                id="phone"
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-              />
-            </div>
+//             {/* Phone Number (optional) */}
+//             <div className="space-y-1">
+//               <Label htmlFor="phone">Phone Number (optional)</Label>
+//               <Input
+//                 id="phone"
+//                 type="tel"
+//                 value={phoneNumber}
+//                 onChange={(e) => setPhoneNumber(e.target.value)}
+//               />
+//             </div>
 
-            {/* Role selector */}
-            <div className="space-y-1">
-              <Label htmlFor="role">Role</Label>
-              <select
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value as any)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
-              >
-                <option value="VIEWER">Viewer</option>
-                <option value="EDITOR">Editor</option>
-                <option value="ADMIN">Admin</option>
-              </select>
-            </div>
+//             {/* Role selector */}
+//             <div className="space-y-1">
+//               <Label htmlFor="role">Role</Label>
+//               <select
+//                 id="role"
+//                 value={role}
+//                 onChange={(e) => setRole(e.target.value as any)}
+//                 className="w-full border border-gray-300 rounded-md px-3 py-2"
+//               >
+//                 <option value="VIEWER">Viewer</option>
+//                 <option value="EDITOR">Editor</option>
+//                 <option value="ADMIN">Admin</option>
+//               </select>
+//             </div>
 
-            {/* Error */}
-            {err && <p className="text-sm text-red-500">{err}</p>}
+//             {/* Error */}
+//             {err && <p className="text-sm text-red-500">{err}</p>}
 
-            {/* Submit */}
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#be965b] hover:bg-yellow-600 text-white"
-            >
-              {loading ? "Creating..." : "Create Account"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+//             {/* Submit */}
+//             <Button
+//               type="submit"
+//               disabled={loading}
+//               className="w-full bg-[#be965b] hover:bg-yellow-600 text-white"
+//             >
+//               {loading ? "Creating..." : "Create Account"}
+//             </Button>
+//           </form>
+//         </CardContent>
+//       </Card>
+//     </div>
+//   );
+// }
 
 
 // "use client";
