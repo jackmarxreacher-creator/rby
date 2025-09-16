@@ -16,7 +16,7 @@ export default function Welcome() {
         <h2 className="text-3xl md:text-4xl px-5 font-bold text-[#be965b] mb-6">
           Welcome to Ricky Boakye Yiadom Ltd.
         </h2>
-        <p className="text-gray-700 text-base md:text-lg text-justify leading-relaxed">
+        <p className="text-gray-700 text-base md:text-lg text-justify sm:text-left leading-relaxed">
           Ricky Boakye Yiadom Ltd has been a trusted name in beverage distribution across Ghana’s Ashanti Region since 1986.
           Built on a foundation of integrity, loyalty, and exceptional service, we proudly partner exclusively with Guinness 
           Ghana Breweries PLC. With modern facilities and nearly four decades of experience, we remain committed to delivering 

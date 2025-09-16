@@ -26,7 +26,7 @@ export default function BlogPreview({
           Latest News & Insights
         </h2>
 
-        <div className="grid grid-cols-1 px-18 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 px-18 sm:px-8 m:grid-cols-2 lg:grid-cols-3 gap-8">
           {isLoading ? (
             Array.from({ length: 3 }).map((_, index) => (
               <div
