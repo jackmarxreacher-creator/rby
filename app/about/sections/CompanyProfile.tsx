@@ -17,13 +17,13 @@ export default function CompanyProfile() {
             <h2 className="text-3xl md:text-4xl font-bold text-[#be965b] my-3">
                 Our Story
             </h2>
-            <p className="text-gray-700 text-base md:text-lg leading-relaxed mb-4">
+            <p className="text-gray-700 text-base md:text-lg text-justify leading-relaxed mb-4">
                 Ricky Boakye Yiadom Ltd stands as a testament to entrepreneurial vision, steady growth, and an unwavering commitment to excellence in beverage distribution across Ghana's Ashanti Region. What began as a modest venture has evolved into one of the region's most trusted distribution partners.
             </p>
             <h3 className="text-xl md:text-xl font-bold text-[#be965b] my-3">
                 Our Heritage
             </h3>
-            <p className="text-gray-700 text-base md:text-lg leading-relaxed">
+            <p className="text-gray-700 text-base md:text-lg text-justify leading-relaxed">
                 Founded in August 1986 by visionary entrepreneur Kofi Boakye Yiadom, our company started its journey from a single store in Atonsu with a simple mission: to provide quality beverages to our community with exceptional service. Mr. Yiadom's dedication to customer satisfaction and business excellence laid the foundation for what would become a thriving enterprise.
             </p>
             </motion.div>
@@ -50,7 +50,7 @@ export default function CompanyProfile() {
             transition={{ duration: 0.6 }}
             >
           <div className="max-w-5xl mx-auto grid">
-            <p className="text-gray-700 text-base md:text-lg leading-relaxed">
+            <p className="text-gray-700 text-base py-3 md:text-lg leading-relaxed">
                 In July 2016, marking a significant milestone in our growth trajectory, we transitioned from a sole proprietorship to a limited liability company, formalizing our commitment to professional business practices and sustainable growth.
             </p>
             <h3 className="text-xl md:text-xl font-bold text-[#be965b] my-3">
