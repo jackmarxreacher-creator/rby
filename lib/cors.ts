@@ -1,23 +1,75 @@
-// lib/cors.ts
 import { NextRequest, NextResponse } from 'next/server';
 
-/**
- * Adds CORS headers and immediately replies 204 to OPTIONS.
- * Returns the 204 response for OPTIONS, or null for normal requests.
- */
+const allowedOrigin = 'https://rbygh.com';
+
 export function cors(req: NextRequest): NextResponse | null {
   if (req.method === 'OPTIONS') {
     return new NextResponse(null, {
       status: 204,
       headers: {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': allowedOrigin,
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Max-Age': '86400',
       },
     });
   }
-  return null; // continue normal flow
+  return null; // Continue normal processing for other methods
 }
+
+
+
+
+
+
+// // lib/cors.ts
+// import { NextRequest, NextResponse } from 'next/server';
+
+// const allowedOrigin = 'https://rbygh.com';
+
+// /**
+//  * Adds CORS headers and immediately replies 204 to OPTIONS.
+//  * Returns the 204 response for OPTIONS, or null for normal requests.
+//  */
+// export function cors(req: NextRequest): NextResponse | null {
+//   if (req.method === 'OPTIONS') {
+//     return new NextResponse(null, {
+//       status: 204,
+//       headers: {
+//         'Access-Control-Allow-Origin': allowedOrigin,
+//         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+//         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+//       },
+//     });
+//   }
+//   return null; // continue normal flow
+// }
+
+
+
+
+
+// // lib/cors.ts
+// import { NextRequest, NextResponse } from 'next/server';
+
+// /**
+//  * Adds CORS headers and immediately replies 204 to OPTIONS.
+//  * Returns the 204 response for OPTIONS, or null for normal requests.
+//  */
+// export function cors(req: NextRequest): NextResponse | null {
+//   if (req.method === 'OPTIONS') {
+//     return new NextResponse(null, {
+//       status: 204,
+//       headers: {
+//         'Access-Control-Allow-Origin': '*',
+//         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+//         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+//       },
+//     });
+//   }
+//   return null; // continue normal flow
+// }
 
 
 

@@ -42,6 +42,9 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
 
+  /*  HOOK MUST BE AT TOP LEVEL  */
+  const { data: session } = useSession();
+
   const links = [
     { href: "/cms", label: "Dashboard", icon: LayoutDashboard },
     { href: "/cms/customers", label: "Customers", icon: Users },
@@ -54,13 +57,12 @@ export default function Sidebar() {
   ];
 
   useEffect(() => {
-    const { data: session } = useSession();
     if (!session?.user?.id) return;
 
     getUser(session.user.id)
       .then((dbUser) => setUser(dbUser ?? session.user))
       .catch(() => setUser(session.user));
-  }, []);
+  }, [session?.user?.id]);   // re-run when session changes
 
   return (
     <aside className="w-64 bg-black text-white flex flex-col h-full">
@@ -153,6 +155,167 @@ export default function Sidebar() {
     </aside>
   );
 }
+
+
+
+
+
+
+// // app/cms/components/Sidebar.tsx
+// "use client";
+
+// import Link from "next/link";
+// import { usePathname } from "next/navigation";
+// import Image from "next/image";
+// import { authClient, useSession } from "@/lib/auth-client";
+// import { getUser } from "@/app/cms/users/actions";
+// import {
+//   LayoutDashboard,
+//   Users,
+//   FileText,
+//   Image as ImageIcon,
+//   Settings,
+//   ClipboardList,
+//   UsersRound,
+//   Package,
+//   LogOut,
+// } from "lucide-react";
+// import {
+//   AlertDialog,
+//   AlertDialogTrigger,
+//   AlertDialogContent,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogCancel,
+//   AlertDialogAction,
+// } from "@/components/ui/alert-dialog";
+// import { useEffect, useState } from "react";
+
+// /* ----------  updated local type: name can be null  ---------- */
+// type User = {
+//   id: string;
+//   name: string | null;
+//   email: string;
+//   image?: string | null;
+// };
+
+// export default function Sidebar() {
+//   const pathname = usePathname();
+//   const [user, setUser] = useState<User | null>(null);
+
+//   const links = [
+//     { href: "/cms", label: "Dashboard", icon: LayoutDashboard },
+//     { href: "/cms/customers", label: "Customers", icon: Users },
+//     { href: "/cms/requests", label: "Requests", icon: ClipboardList },
+//     { href: "/cms/products", label: "Products", icon: Package },
+//     { href: "/cms/blog", label: "Blog Posts", icon: FileText },
+//     { href: "/cms/users", label: "Users & Roles", icon: UsersRound },
+//     { href: "/cms/gallery", label: "Gallery", icon: ImageIcon },
+//     { href: "/cms/settings", label: "Settings", icon: Settings },
+//   ];
+
+//   useEffect(() => {
+//     const { data: session } = useSession();
+//     if (!session?.user?.id) return;
+
+//     getUser(session.user.id)
+//       .then((dbUser) => setUser(dbUser ?? session.user))
+//       .catch(() => setUser(session.user));
+//   }, []);
+
+//   return (
+//     <aside className="w-64 bg-black text-white flex flex-col h-full">
+//       {/* Logo */}
+//       <div className="p-4 font-bold text-lg border-b border-neutral-800 flex items-center space-x-3">
+//         <Image
+//           src={user?.image || "/images/logos/rby_color_logo.webp"}
+//           alt="RBY Logo"
+//           width={32}
+//           height={32}
+//           className="object-contain"
+//         />
+//         <div>
+//           <span>RBY LTD.</span>
+//           <p className="text-xs text-gray-400">Content Management</p>
+//         </div>
+//       </div>
+
+//       {/* Nav Links */}
+//       <nav className="flex-1 p-4 space-y-2">
+//         {links.map(({ href, label, icon: Icon }) => (
+//           <Link
+//             key={href}
+//             href={href}
+//             className={`flex items-center space-x-3 px-3 py-2 rounded-md transition ${
+//               pathname === href
+//                 ? "bg-[#be965b] text-black font-medium"
+//                 : "text-gray-300 hover:bg-neutral-800"
+//             }`}
+//           >
+//             <Icon className="h-5 w-5" />
+//             <span>{label}</span>
+//           </Link>
+//         ))}
+//       </nav>
+
+//       {/* Footer with Profile + Logout */}
+//       <div className="p-4 border-t border-neutral-800 text-sm text-gray-400 space-y-4">
+//         <div className="flex items-center space-x-3">
+//           {user ? (
+//             <>
+//               <Image
+//                 src={user.image || "/images/user.jpg"}
+//                 alt={user.name ?? "User"}
+//                 width={40}
+//                 height={40}
+//                 className="rounded-full object-cover border border-neutral-700"
+//               />
+//               <div>
+//                 <p className="font-medium text-white">{user.name ?? "User"}</p>
+//                 <p className="text-xs text-gray-400">{user.email}</p>
+//               </div>
+//             </>
+//           ) : (
+//             <div>
+//               <p className="font-medium text-white">Loading…</p>
+//               <p className="text-xs text-gray-400">please wait</p>
+//             </div>
+//           )}
+//         </div>
+
+//         <AlertDialog>
+//           <AlertDialogTrigger asChild>
+//             <button className="flex items-center space-x-3 px-3 py-2 rounded-md text-red-400 hover:bg-neutral-800 hover:text-red transition w-full text-left">
+//               <LogOut className="h-5 w-5" />
+//               <span>Logout</span>
+//             </button>
+//           </AlertDialogTrigger>
+//           <AlertDialogContent>
+//             <AlertDialogHeader>
+//               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+//               <AlertDialogDescription>
+//                 You will be logged out and redirected to the homepage.
+//               </AlertDialogDescription>
+//             </AlertDialogHeader>
+//             <AlertDialogFooter>
+//               <AlertDialogCancel>Cancel</AlertDialogCancel>
+//               <AlertDialogAction
+//                 onClick={async () => {
+//                   await authClient.signOut();
+//                   window.location.href = "/";
+//                 }}
+//               >
+//                 Logout
+//               </AlertDialogAction>
+//             </AlertDialogFooter>
+//           </AlertDialogContent>
+//         </AlertDialog>
+//       </div>
+//     </aside>
+//   );
+// }
 
 
 
