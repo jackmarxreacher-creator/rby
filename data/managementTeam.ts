@@ -2,7 +2,7 @@
 
 export const managementTeam = [
   {
-    name: 'Ricky Boakye Yiadom',
+    name: 'Kofi Boakye Yiadom',
     role: 'CEO & Founder',
     bio: `Mr. Kofi Boakye Yiadom is the Founder and Chief Executive Officer of Ricky Boakye Yiadom Limited, one of the most respected and high-performing distributors of Guinness Ghana Breweries PLC. Since establishing the company in 1986, he has led it through decades of growth and transformation, positioning it as a cornerstone in distribution in Ghana’s fast-moving consumer goods (FMCG) landscape.
 A voracious autodidact and master of experiential learning, he is revered for his eloquence and fondness for sesquipedalian vocabulary, often delivering powerful business insights wrapped in grandiloquent diction that commands attention and admiration. He lives by a personal ethos that greatness is forged through continuous learning, adaptation, and vision.
@@ -24,7 +24,7 @@ Currently serving as Managing Director, Lesley leverages over a decade of hands-
   },
   {
     name: 'Victoria Boakye Yiadom',
-    role: 'MD Spirits',
+    role: 'Managing Director, Spirits',
     bio: `Mrs. Victoria Boakye Yiadom is an accomplished businesswoman and a central figure in the leadership of Ricky Boakye Yiadom Limited, where she currently serves as Managing Director of the Spirits Division. Her career spans beverage distribution, telecom operations, and executive management which makes her one of the most versatile leaders in the company.
 She began her professional journey at Guinness Ghana Breweries Limited (GGBL), where she developed an early foundation in the beverage industry. Her exposure to the inner workings of one of Ghana’s most influential manufacturers helped shape her understanding of market dynamics and operational excellence.
 Upon joining Ricky Boakye Yiadom Limited, she initially served in a managerial role, contributing to the company’s mid-level operations and gaining firsthand experience in distributor operations, customer relations, and field execution. Her performance and leadership potential quickly stood out.
@@ -37,7 +37,7 @@ Known for her steady execution, deep market understanding, and team-focused lead
   {
     name: 'Dennis Asafo Adjei',
     role: 'General Manager',
-    bio: `Dennis MG brings over 15 years of exceptional leadership experience to Ricky Boakye Yiadom Ltd, driving strategic growth and operational excellence as a key distributor for Guinness Ghana PLC.
+    bio: `Dennis Asafo Adjei brings over 15 years of exceptional leadership experience to Ricky Boakye Yiadom Ltd, driving strategic growth and operational excellence as a key distributor for Guinness Ghana PLC.
 Dennis joined our organization in 2021 as Head of Human Resource & Compliance and was promoted to General Manager in May 2025. His distinguished background spans 11 years in banking and beverage distribution, bringing unique cross-sector expertise that strengthens our competitive advantage.
 Dennis demonstrates exceptional capabilities in strategic planning, relationship management, team building, and operational optimization.
 Dennis's leadership philosophy centers on fostering innovation, driving sustainable growth, and developing team members to achieve their full potential. Under his guidance, our company has strengthened operational frameworks, enhanced customer relationships, and positioned itself for long term market leadership.
@@ -46,7 +46,7 @@ Dennis exemplifies our values of excellence, integrity, and dedication to creati
     image: '/images/staff/DENNIS ASAFO ADJEI.webp',
   },
   {
-    name: 'Audrey Boakye-Yiadom',
+    name: 'Audrey Boakye Yiadom',
     role: 'Operations Manager',
     bio: `Audrey Boakye-Yiadom is an accomplished operations professional with over eight years of hands-on experience in the insurance and financial services industry. Currently serving as the Operations Manager at Ricky Boakye Yiadom Ltd, she leverages her deep expertise in claims processing, workflow optimization, and strategic planning to drive organizational efficiency and performance.
 She holds a Master’s degree in Finance & Investment from Loughborough University, along with a Bachelor’s degree in Actuarial Science from Kwame Nkrumah University of Science and Technology (KNUST). Audrey previously held key roles at SIC Insurance PLC, rising through the ranks from Claims Officer to Senior Claims Officer, where she co-led the development of company-wide SOPs and digital transformation initiatives.
@@ -88,7 +88,7 @@ Motivated by a vision of logistics that emphasizes convenience and reliability, 
     image: '/images/staff/GEORGE ABBAN2.webp',
   },
   {
-    name: 'Paul Amankwah Agyeman',
+    name: 'Paul Amankwaah Agyeman',
     role: 'Ejisu Satellite Depot Manager',
     bio: `Paul's professional journey exemplifies the perfect blend of academic excellence and diverse industry experience. Armed with an HND in Marketing and BSc. in Business Administration (Marketing), complemented by technical certifications in Hardware and Network Engineering and Cisco Certified Network Associate (CCNA), Paul brings both marketing expertise and technical proficiency to his role.
 His career began with Guinness Ghana Breweries Limited as a Trade Promoter during National Service, providing foundational experience in Ghana's beverage industry. This early exposure to Guinness operations would prove invaluable for his future role at RBY, Ghana's longest-serving Guinness distributor.
