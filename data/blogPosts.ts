@@ -8,7 +8,7 @@ export const blogPosts = [
     slug: 'guinness-national-promo',
   },
   {
-    title: 'Retailer Training Event – Accra',
+    title: 'Retailer Training Event - Accra',
     excerpt: 'We hosted our key retailers for a workshop on effective distribution strategies...',
     image: '/images/blog/Guinness-training.jpeg',
     slug: 'retailer-training-event',
@@ -45,7 +45,7 @@ export const blogPosts = [
   },
   {
     title: 'New Warehouse Launch in Tamale',
-    excerpt: 'We’ve expanded! Take a look at our new state-of-the-art warehouse...',
+    excerpt: `We've expanded! Take a look at our new state-of-the-art warehouse...`,
     image: '/images/blog/new-warehouse-tamale.webp',
     slug: 'warehouse-launch-tamale',
   },
