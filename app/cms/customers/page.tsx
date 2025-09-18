@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { getCustomers } from "./actions";
-import { CustomerCard } from "./_components/CustomerCard";
+import  CustomerCard  from "./_components/CustomerCard";
 import { CustomersTable } from "./_components/CustomersTable";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";

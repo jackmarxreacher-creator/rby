@@ -1,3 +1,4 @@
+// schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -28,6 +29,10 @@ model User {
   createdGalleryItems GalleryItem[] @relation("CreatedByGalleryItems")
   updatedGalleryItems GalleryItem[] @relation("UpdatedByGalleryItems")
   deletedGalleryItems GalleryItem[] @relation("DeletedByGalleryItems")
+
+  // ----------  NEW audit relations  ----------
+  createdCustomers Customer[] @relation("CustomerCreatedBy")
+  updatedCustomers Customer[] @relation("CustomerUpdatedBy")
 }
 
 model Customer {
@@ -39,9 +44,17 @@ model Customer {
   phone        String
   location     String?
   address      String?
+  image        String?       @default("/images/user.jpg")   // NEW
+  createdById  String?                                     // NEW
+  createdBy    User?         @relation("CustomerCreatedBy", fields: [createdById], references: [id])
+  updatedById  String?                                     // NEW
+  updatedBy    User?         @relation("CustomerUpdatedBy", fields: [updatedById], references: [id])
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   orders       Order[]
+
+  @@index([createdById])
+  @@index([updatedById])
 }
 
 model Order {
