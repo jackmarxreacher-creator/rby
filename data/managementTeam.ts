@@ -84,7 +84,12 @@ Motivated by a vision of logistics that emphasizes convenience and reliability, 
   {
     name: 'George Abban',
     role: 'HR & Compliance Manager',
-    bio: `To Do`,
+    bio: `George Abban's professional journey at Ricky Boakye Yiadom Ltd. exemplifies the power of dedication, strategic thinking, and exceptional leadership. Since joining the organization in 2023 as a Spirits
+Supervisor, Mr. Abban has consistently demonstrated an unwavering commitment to excellence that has positioned him as one of the company's most valued managers.
+His initial role in spirits supervision provided the foundation for what would become a remarkable trajectory of professional growth. Recognizing his exceptional performance and natural leadership abilities, the organization expanded his responsibilities to include Fuel Management operations, where he continued to excel while managing complex operational challenges with remarkable efficiency and strategic insight.
+The culmination of Mr. Abban's outstanding contributions came in May 2025 when he was promoted to his current role as Human Resources & Compliance Manager. This promotion was not merely a recognition of past achievements but a testament to his comprehensive skill set spanning human resources management, regulatory compliance, policy development, and operational excellence. His expertise in employee relations, talent acquisition, and workforce development has become instrumental in shaping the organization's human capital strategy.
+Mr. Abban's approach to leadership is characterized by his commitment to fostering a professional workplace culture built on the pillars of accountability, equity, and continuous growth. His strategic vision extends beyond traditional HR functions to encompass compliance oversight, risk management frameworks, and the development of policies that drive organizational effectiveness. Through his crossfunctional support and process optimization initiatives, he has consistently delivered results that enhance both employee satisfaction and operational performance.
+As a key member of RBY's senior management team, George Abban's multifaceted expertise continues to strengthen the company's human capital infrastructure while supporting its strategic mission. `,
     image: '/images/staff/GEORGE ABBAN2.webp',
   },
   {
