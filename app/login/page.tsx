@@ -27,16 +27,28 @@ export default function CmsLoginPage() {
     setErr(null);
     setLoading(true);
 
-    const { data, error } = await authClient.signIn.email({
-      email,
-      password,
-    });
+    try {
+      console.log("Attempting login with:", email);
+      const { data, error } = await authClient.signIn.email({
+        email,
+        password,
+      });
 
-    if (error) {
-      setErr(error.message || "Login failed");
+      console.log("Login response:", { data, error });
+
+      if (error) {
+        console.error("Login error:", error);
+        setErr(error.message || "Login failed");
+        setLoading(false);
+      } else {
+        console.log("Login successful, redirecting...");
+        // Success - redirect to CMS
+        router.push("/cms");
+        // Note: don't set loading to false here as we're redirecting
+      }
+    } catch (error) {
+      setErr("Network error. Please try again.");
       setLoading(false);
-    } else {
-      router.push("/cms");
     }
   };
 
