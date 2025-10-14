@@ -1,11 +1,13 @@
-'use client';
+"use client";
 
 import { useEffect } from 'react';
 import Image from 'next/image';
-import { newProducts } from '@/data/newProducts';
+import { newProducts as fallbackProducts } from '@/data/newProducts';
 import { motion, useAnimation } from 'framer-motion';
 
-export default function NewProductsMarquee() {
+type Item = { id?: string; name: string; image: string };
+
+export default function NewProductsMarquee({ products }: { products?: Item[] }) {
   const controls = useAnimation();
 
   useEffect(() => {
@@ -19,7 +21,8 @@ export default function NewProductsMarquee() {
     });
   }, [controls]);
 
-  const duplicated = [...newProducts, ...newProducts]; // seamless loop
+  const source = products && products.length ? products : fallbackProducts;
+  const duplicated = [...source, ...source]; // seamless loop
 
   return (
     <section className="bg-[#f3ede5] py-6 overflow-hidden border-t border-[#e2d9cd]">
@@ -52,8 +55,8 @@ export default function NewProductsMarquee() {
                   className="object-cover"
                 />
               </div>
-              <span className="text-base font-medium text-gray-800">
-                {product.name}
+              <span className="text-base font-medium text-gray-800" title={product.name}>
+                {product.name.length > 10 ? `${product.name.slice(0, 10)}…` : product.name}
               </span>
             </div>
           ))}

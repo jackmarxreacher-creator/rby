@@ -4,6 +4,8 @@ import { useState } from "react";
 import OrderForm from "../_components/OrderForm";
 import CustomerSelectDialog from "../_components/CustomerSelectDialog";
 import { createRequest } from "../actions";
+import { useServerAction } from "@/lib/use-server-action";
+import { useRouter } from "next/navigation";
 
 interface Props {
   products: any[];
@@ -13,6 +15,9 @@ export default function NewRequestClient({ products }: Props) {
   const [existingCustomerMode, setExistingCustomerMode] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const router = useRouter();
+
+  const wrappedCreate = useServerAction(createRequest as any);
 
   const handleSelectCustomer = (customer: any) => {
     setSelectedCustomer(customer);
@@ -27,8 +32,8 @@ export default function NewRequestClient({ products }: Props) {
 
   /* ----  submit the form data ---- */
   async function handleSubmit(formData: FormData) {
-    await createRequest(formData);
-    window.location.href = "/cms/requests";
+    const res = await wrappedCreate(formData);
+    if (res.ok) router.push("/cms/requests");
   }
 
   return (

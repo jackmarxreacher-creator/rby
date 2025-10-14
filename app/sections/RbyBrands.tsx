@@ -57,7 +57,7 @@ export default function Brands() {
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                <div className="relative w-full h-full max-h-[50px] max-w-[80px] mx-auto filter grayscale hover:grayscale-0 transition duration-500">
+                <div className="relative w-full h-full max-h-[50px] max-w-[80px] mx-auto filter hover:grayscale transition duration-500">
                   <Image
                     src={brand.image}
                     alt={brand.name}

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { GalleryTable } from "./_components/GalleryTable";
 import { ViewToggle, ViewType } from "@/components/ui/ViewToggle";
 import ClientGalleryGridWrapper from "./_components/ClientGalleryGridWrapper";
+import FilterControls from "./_components/FilterControls";
 
 export default async function GalleryPage({
   searchParams,
@@ -26,18 +27,21 @@ export default async function GalleryPage({
 
   return (
     <div className="p-6 bg-[#fcfbf8] min-h-screen">
-      <div className="flex items-center justify-between p-5 shadow-lg mb-8">
-        <h1 className="text-3xl font-bold text-[#1c1c1c]">Gallery</h1>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 shadow-lg mb-8 gap-3">
+        <h1 className="text-3xl font-bold text-[#1c1c1c]"></h1>
         <div className="flex items-center gap-4">
+          <div className="mr-4">
+            <FilterControls />
+          </div>
           <ViewToggle current={currentView} basePath="/cms/gallery" />
           <Button className="bg-[#be965b] hover:bg-[#a88248] text-black">
-            <Link href="/cms/gallery/new">Add Gallery Item</Link>
+            <Link href="/cms/gallery/new">Add Media</Link>
           </Button>
         </div>
       </div>
 
       {galleryItems.length === 0 ? (
-        <div className="text-center py-10">
+        <div className="text-center py-6">
           <p className="text-[#4a4a4a] text-lg">No gallery items yet.</p>
           <Button
             variant="outline"

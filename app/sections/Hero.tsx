@@ -8,11 +8,12 @@ import Link from 'next/link';
 export default function Hero() {
   return (
     <section
+      data-hero
       className="relative w-full h-[400px] bg-cover bg-center flex items-center justify-center"
-      style={{ backgroundImage: `url('/images/banners/hero.webp')` }} // Make sure the image is in the public folder
+      style={{ backgroundImage: `url('/images/banners/rby_hero.webp')` }} // Make sure the image is in the public folder
     >
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/70" />
+      <div className="absolute inset-0 bg-black/60" />
 
       {/* Content */}
       <motion.div

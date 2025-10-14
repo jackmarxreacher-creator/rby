@@ -19,7 +19,10 @@ export default async function UsersPage({
     id: u.id,
     name: u.name ?? "", // ✅ always string
     email: u.email,
-    role: u.role,
+    // Prisma role may be null; ensure the UI receives a valid role string
+    role: (u.role ?? "STAFF") as "ADMIN" | "EDITOR" | "MANAGER" | "STAFF",
+    // prefer undefined for optional fields so component prop types match
+    department: u.department ?? undefined,
     phoneNumber: u.phoneNumber ?? null,
     image: u.image ?? null,
   }));
@@ -29,7 +32,7 @@ export default async function UsersPage({
   return (
     <div className="p-6 bg-[#fcfbf8] min-h-screen">
       <div className="flex items-center justify-between p-5 shadow-lg mb-8">
-        <h1 className="text-3xl font-bold text-[#1c1c1c]">Users & Roles</h1>
+        <h1 className="text-3xl font-bold text-[#1c1c1c]"></h1>
 
         <div className="flex items-center gap-4">
           <ViewToggle current={currentView} basePath="/cms/users" />

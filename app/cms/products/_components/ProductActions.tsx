@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { deleteProduct } from "../actions";
+import { useServerAction } from "@/lib/use-server-action";
 
 interface Props {
   product: {
@@ -24,9 +25,11 @@ interface Props {
 export function ProductActions({ product }: Props) {
   const [open, setOpen] = useState(false);
 
+  const deleteWithToast = useServerAction(deleteProduct);
+
   const handleDelete = async () => {
-    await deleteProduct(product.id);
-    setOpen(false);
+    const res = await deleteWithToast(product.id);
+    if (res?.ok) setOpen(false);
   };
 
   return (

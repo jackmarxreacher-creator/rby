@@ -1,4 +1,3 @@
-// schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,7 +16,8 @@ model User {
   emailVerified Boolean   @default(false)
   image         String?
   phoneNumber   String?   @unique
-  role          Role      @default(VIEWER)
+  role          Role?
+  department    Department?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -34,6 +34,14 @@ model User {
 
   createdCustomers Customer[] @relation("CustomerCreatedBy")
   updatedCustomers Customer[] @relation("CustomerUpdatedBy")
+
+  activityLogs UserActivityLog[]
+
+  createdProducts Product[] @relation("ProductCreatedBy")
+  updatedProducts Product[] @relation("ProductUpdatedBy")
+
+  createdBlogPosts BlogPost[] @relation("BlogPostCreatedBy")
+  updatedBlogPosts BlogPost[] @relation("BlogPostUpdatedBy")
 }
 
 model Customer {
@@ -41,6 +49,8 @@ model Customer {
   name         String
   businessName String?
   businessType BusinessType
+  uom          UOM           @default(BOTTLE)
+  casePack     Int           @default(0)
   email        String        @unique
   phone        String
   location     String?
@@ -97,6 +107,8 @@ model Product {
   name           String
   image          String?
   size           String
+  uom            UOM        @default(BOTTLE)
+  casePack       Int        @default(0)
   wholesalePrice Int
   retailPrice    Int
   description    String?
@@ -105,6 +117,11 @@ model Product {
   updatedAt      DateTime   @updatedAt
   category       Category
   orderItems     OrderItem[]
+
+  createdById String?
+  createdBy   User?       @relation("ProductCreatedBy", fields: [createdById], references: [id])
+  updatedById String?
+  updatedBy   User?       @relation("ProductUpdatedBy", fields: [updatedById], references: [id])
 }
 
 model Session {
@@ -172,6 +189,7 @@ model BlogPost {
   subHeading  String?
   caption     String?
   slug        String   @unique
+  excerpt     String
   coverImage  String?  // "/images/blog/xxx.jpg"
   content     Json     // TipTap JSON document
   isPublished Boolean  @default(false)
@@ -179,15 +197,43 @@ model BlogPost {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  createdById String?
+  createdBy   User?       @relation("BlogPostCreatedBy", fields: [createdById], references: [id])
+  updatedById String?
+  updatedBy   User?       @relation("BlogPostUpdatedBy", fields: [updatedById], references: [id])
+
   @@index([slug])
   @@index([isPublished])
+}
+
+// -------------- USER ACTIVITY LOG -----------
+model UserActivityLog {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  action      String
+  description String
+  metadata    Json?
+  timestamp   DateTime @default(now())
+
+  @@index([userId])
+  @@index([timestamp])
 }
 
 // ------------------  ENUMS  ------------------
 enum Role {
   ADMIN
   EDITOR
-  VIEWER
+  MANAGER
+  STAFF
+}
+
+enum Department {
+  Administration
+  Finance
+  HR
+  Sales
+  Warehouse
 }
 
 enum BusinessType {
@@ -204,15 +250,22 @@ enum OrderStatus {
 }
 
 enum Category {
-  Beer
-  Wine
-  Spirits
-  Liqueur
-  Cocktail
-  SoftDrink
-  Juice
-  Mocktail
-  Water
+  STOUT
+  RTD
+  LAGERS
+  BITTERS
+  GIN
+  LIQUEUR
+  RUM
+  TEQUILA
+  VODKA
+  SINGLE_MALT_WHISKY
+  WHISKY
+}
+
+enum UOM {
+  CAS
+  BOTTLE
 }
 
 enum GalleryItemType {

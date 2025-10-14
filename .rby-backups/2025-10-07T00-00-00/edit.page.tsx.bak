@@ -1,0 +1,44 @@
+// Added Create By and Updated By
+import { prisma } from "@/lib/prisma";
+import { ProductForm } from "../_components/ProductForm";
+import { redirect } from "next/navigation";
+import { updateProduct } from "../actions";
+import { getAuth } from "@/lib/auth"; // server-side Better-Auth helper
+
+export default async function EditProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const product = await prisma.product.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      category: true,
+      size: true,
+      wholesalePrice: true,
+      retailPrice: true,
+      description: true,
+      discount: true,
+      image: true,
+      createdAt: true,
+      updatedAt: true,
+      createdById: true, // \u2190 added
+      updatedById: true, // \u2190 added
+    },
+  });
+
+  if (!product) redirect("/cms/products");
+
+  const session = await getAuth();
+  if (!session?.user?.id) redirect("/login");
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold mb-4">Edit Product</h1>
+      <ProductForm initial={product} onSave={updateProduct.bind(null, id)} />
+    </div>
+  );
+}

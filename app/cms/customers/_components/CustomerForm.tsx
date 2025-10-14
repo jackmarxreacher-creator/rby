@@ -13,6 +13,8 @@ interface Customer {
   location?: string;
   address?: string;
   businessType?: string;
+  uom?: string;
+  casePack?: number;
   image?: string | null;
 }
 
@@ -134,6 +136,34 @@ export default function CustomerForm({ initialCustomer, onSave }: CustomerFormPr
           defaultValue={initialCustomer?.address ?? ""}
           className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#be965b]"
         />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div>
+          <label className="block text-sm font-medium mb-1">Unit of Measure (UOM) <span className="text-red-500">*</span></label>
+          <select
+            name="uom"
+            required
+            defaultValue={(initialCustomer?.uom as string) ?? ""}
+            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#be965b] text-gray-600"
+          >
+            <option value="" disabled>Select UOM</option>
+            <option value="CAS">Case</option>
+            <option value="BOTTLE">Bottle</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Case Pack (integer)</label>
+          <input
+            type="number"
+            name="casePack"
+            min={0}
+            step={1}
+            defaultValue={initialCustomer?.casePack ?? 0}
+            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#be965b]"
+          />
+        </div>
       </div>
 
       {/* NEW – Cancel + Save buttons */}

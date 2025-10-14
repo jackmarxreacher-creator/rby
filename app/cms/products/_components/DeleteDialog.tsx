@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { deleteProduct } from "../actions";
+import { useServerAction } from "@/lib/use-server-action";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,9 +21,11 @@ interface Props {
 export function DeleteDialog({ productId }: Props) {
   const [open, setOpen] = useState(false);
 
+  const deleteWithToast = useServerAction(deleteProduct);
+
   async function handleDelete() {
-    await deleteProduct(productId);
-    setOpen(false);
+    const res = await deleteWithToast(productId);
+    if (res?.ok) setOpen(false);
   }
 
   return (

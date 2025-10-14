@@ -11,7 +11,7 @@ import type { Product, Category } from "@prisma/client"; // ← import types
 
 interface Props {
   initial?: Product;
-  onSave: (data: FormData) => Promise<void>;
+  onSave: (data: FormData) => Promise<{ ok: boolean; message: string }>;
 }
 
 export function ProductForm({ initial, onSave }: Props) {
@@ -22,9 +22,9 @@ export function ProductForm({ initial, onSave }: Props) {
     e.preventDefault();
     setLoading(true);
     const form = new FormData(e.currentTarget);
-    await onSave(form);
+    const res = await onSave(form);
     setLoading(false);
-    router.push("/cms/products");
+    if (res?.ok) router.push("/cms/products");
   }
 
   return (
@@ -62,7 +62,7 @@ export function ProductForm({ initial, onSave }: Props) {
             <option value="" disabled>
               Select Product Category
             </option>
-            {["Beer", "Wine", "Spirits", "Liqueur", "Cocktail", "Soft Drink", "Juice", "Mocktail", "Water"].map((c) => (
+            {["STOUT", "RTD", "LAGERS", "BITTERS", "GIN", "LIQUEUR", "RUM", "TEQUILA", "VODKA", "SINGLE_MALT_WHISKY", "WHISKY"].map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
@@ -121,6 +121,35 @@ export function ProductForm({ initial, onSave }: Props) {
             type="number"
             defaultValue={initial?.retailPrice}
             required
+            className="border-[#cccccc] focus:border-[#be965b] focus:ring-[#be965b]"
+          />
+        </div>
+      </div>
+
+      {/* UOM & Case Pack (new) */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label className="text-[#1c1c1c]">Unit of Measure (UOM)</Label>
+          <select
+            name="uom"
+            defaultValue={(initial as any)?.uom ?? ""
+            }
+            className="flex h-10 w-full rounded-md border border-[#cccccc] bg-transparent px-3 py-2 text-sm focus:border-[#be965b] focus:ring-[#be965b] text-gray-600"
+          >
+            <option value="">Select UOM</option>
+            <option value="CAS">Case</option>
+            <option value="BOTTLE">Bottle</option>
+          </select>
+        </div>
+
+        <div>
+          <Label className="text-[#1c1c1c]">Case Pack (integer)</Label>
+          <Input
+            name="casePack"
+            type="number"
+            min={0}
+            step={1}
+            defaultValue={(initial as any)?.casePack ?? 0}
             className="border-[#cccccc] focus:border-[#be965b] focus:ring-[#be965b]"
           />
         </div>

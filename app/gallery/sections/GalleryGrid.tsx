@@ -73,9 +73,9 @@ export default function GalleryGrid({ galleryItems }: Props) {
     <section className="py-16 px-4 md:px-8 bg-[#fcfbf8]">
       <div className="max-w-6xl mx-auto">
         {/* Title */}
-        <h2 className="text-3xl font-bold text-center mb-8 text-[#be965b]">
+        {/* <h2 className="text-3xl font-bold text-center mb-8 text-[#be965b]">
           Our Gallery
-        </h2>
+        </h2> */}
 
         {/* Filter Buttons */}
         <div className="flex justify-center space-x-4 mb-10">
@@ -111,13 +111,9 @@ export default function GalleryGrid({ galleryItems }: Props) {
               onClick={() => handleItemClick(item, idx)}
             >
               {item.type === "photo" ? (
-                <Image
-                  src={item.thumbnail}
-                  alt={item.title}
-                  width={400}
-                  height={250}
-                  className="w-full h-48 object-cover"
-                />
+                <div className="relative w-full h-48">
+                  <Image src={item.thumbnail} alt={item.title} fill className="object-cover" />
+                </div>
               ) : (
                 <div className="relative">
                   <video

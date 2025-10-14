@@ -1,9 +1,9 @@
 // app/cms/gallery/[id]/page.tsx
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { GalleryForm } from "../_components/GalleryForm";
-import { updateGalleryItem } from "../actions";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import GalleryEditFormWrapper from "../_components/GalleryEditFormWrapper";
+import { updateGalleryItem, getGalleryItem } from "../actions";
+import { getAuth } from "@/lib/auth"; // Better-Auth server helper
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -12,22 +12,92 @@ interface PageProps {
 export default async function EditGalleryPage({ params }: PageProps) {
   const { id } = await params;
 
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) notFound();
+  /* 1️⃣  fetch existing item */
+  const item = await getGalleryItem(id);
+  if (!item) notFound();
 
-  async function handleUpdate(data: FormData) {
-    "use server";
-    if (!session) throw new Error("Unauthorized"); // extra guard for TS
-    await updateGalleryItem(id, data, session.user.id);
-  }
+  /* 2️⃣  auth check */
+  const session = await getAuth();
+  if (!session?.user?.id) redirect("/login");
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Edit Gallery Item</h1>
-      <GalleryForm onSave={handleUpdate} />
+      {/* 3️⃣  pass initial data via client wrapper */}
+      <GalleryEditFormWrapper
+        id={id}
+        initial={{
+          id: item.id,
+          type: item.type,
+          title: item.title,
+          thumbnail: item.thumbnail,
+          src: item.src,
+        }}
+      />
     </div>
   );
 }
+
+
+
+
+
+// // app/cms/gallery/[id]/page.tsx
+// import { notFound, redirect } from "next/navigation";
+// import { GalleryForm } from "../_components/GalleryForm";
+// import { updateGalleryItem } from "../actions";
+// import { getAuth } from "@/lib/auth"; // Better-Auth server helper
+
+// interface PageProps {
+//   params: Promise<{ id: string }>;
+// }
+
+// export default async function EditGalleryPage({ params }: PageProps) {
+//   const { id } = await params;
+
+//   const session = await getAuth();
+//   if (!session?.user?.id) redirect("/login");
+
+//   return (
+//     <div>
+//       <h1 className="text-2xl font-bold mb-4">Edit Gallery Item</h1>
+//       <GalleryForm onSave={updateGalleryItem.bind(null, id)} />
+//     </div>
+//   );
+// }
+
+
+
+// // app/cms/gallery/[id]/page.tsx
+// import { notFound } from "next/navigation";
+// import { GalleryForm } from "../_components/GalleryForm";
+// import { updateGalleryItem } from "../actions";
+// import { auth } from "@/lib/auth";
+// import { headers } from "next/headers";
+
+// interface PageProps {
+//   params: Promise<{ id: string }>;
+// }
+
+// export default async function EditGalleryPage({ params }: PageProps) {
+//   const { id } = await params;
+
+//   const session = await auth.api.getSession({ headers: await headers() });
+//   if (!session) notFound();
+
+//   async function handleUpdate(data: FormData) {
+//     "use server";
+//     if (!session) throw new Error("Unauthorized"); // extra guard for TS
+//     await updateGalleryItem(id, data, session.user.id);
+//   }
+
+//   return (
+//     <div>
+//       <h1 className="text-2xl font-bold mb-4">Edit Gallery Item</h1>
+//       <GalleryForm onSave={handleUpdate} />
+//     </div>
+//   );
+// }
 
 
 

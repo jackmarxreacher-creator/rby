@@ -37,7 +37,7 @@ const empty: BlogInputs = {
 /* ----------  PROPS  ---------- */
 interface Props {
   post?: BlogInputs;
-  onSave: (data: BlogInputs) => Promise<{ id: string }>;
+  onSave: (data: BlogInputs) => Promise<{ ok: boolean; message: string }>;
 }
 
 /* ----------  COMPONENT  ---------- */
@@ -61,8 +61,8 @@ export default function BlogForm({ post, onSave }: Props) {
 
   /* ----------  SUBMIT  ---------- */
   const onSubmit: SubmitHandler<BlogInputs> = async (data) => {
-    await onSave({ ...data, isPublished: willPublish });
-    router.push("/cms/blog");
+    const res = await onSave({ ...data, isPublished: willPublish });
+    if (res?.ok) router.push("/cms/blog");
   };
 
   /* ----------  IMAGE UPLOAD  ---------- */

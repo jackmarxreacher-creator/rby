@@ -2,7 +2,7 @@ import PageHero from "@/app/common/PageHero";
 import CompanyProfile from "./sections/CompanyProfile";
 import AboutPrinciples from "./sections/AboutPrinciples";
 import ManagementTeam from "./sections/ManagementTeam";
-import NewProductsMarquee from "./sections/NewProductsMarquee";
+import NewProductsMarquee from "./sections/NewProductsMarqueeServer";
 
 
 export default function AboutPage() {
@@ -18,7 +18,7 @@ export default function AboutPage() {
         <CompanyProfile />
         <AboutPrinciples />
         <ManagementTeam />
-        <NewProductsMarquee />
+  <NewProductsMarquee />
       </main>
     </>
   );

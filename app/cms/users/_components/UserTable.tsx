@@ -9,7 +9,8 @@ interface Props {
     id: string;
     name: string;
     email: string;
-    role: "ADMIN" | "EDITOR" | "VIEWER";
+    role: "ADMIN" | "EDITOR" | "MANAGER" | "STAFF";
+    department?: "Administration" | "Finance" | "HR" | "Sales" | "Warehouse";
     phoneNumber?: string | null;
     image?: string | null;
   }[];
@@ -51,6 +52,9 @@ export function UserTable({ users }: Props) {
                 Role
               </th>
               <th className="px-4 py-2 text-left text-sm font-semibold text-[#1c1c1c]">
+                Department
+              </th>
+              <th className="px-4 py-2 text-left text-sm font-semibold text-[#1c1c1c]">
                 Phone
               </th>
               <th className="px-4 py-2 text-left text-sm font-semibold text-[#1c1c1c]">
@@ -77,6 +81,7 @@ export function UserTable({ users }: Props) {
                 <td className="px-4 py-2 text-sm text-[#be965b] font-semibold">
                   {u.role}
                 </td>
+                <td className="px-4 py-2 text-sm text-[#4a4a4a]">{u.department ?? "—"}</td>
                 <td className="px-4 py-2 text-sm text-[#4a4a4a]">
                   {u.phoneNumber ?? "—"}
                 </td>

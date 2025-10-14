@@ -13,7 +13,7 @@ const contactDetails = [
   {
     icon: <FiPhone size={24} />,
     label: 'Phone',
-    value: '+233 30 804 0125',
+    value: 'Main: +233 30 804 0125   \n Ejisu: +233 53 103 3340',
   },
   {
     icon: <FiMail size={24} />,

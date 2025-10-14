@@ -219,3 +219,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Default: allow content to sit under the transparent header */
+body > main {
+  padding-top: 0;
+}

@@ -11,6 +11,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { ProductActions } from "./ProductActions";
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import type { Product } from "@prisma/client";
 
 interface Props {
@@ -42,21 +43,55 @@ export function ProductCard({ products }: Props) {
             className="bg-[#fcfbf8] border border-[#cccccc] rounded-xl shadow-sm hover:shadow-lg"
           >
             <CardHeader className="p-3">
-              <Image
-                src={product.image || "/placeholder.jpg"}
-                alt={product.name}
-                width={225}
-                height={150}
-                className="w-full h-40 object-contain rounded-t-xl"
-              />
+              <div className="relative w-full h-36 sm:h-40 rounded-t-xl overflow-hidden bg-white flex items-center justify-center">
+                <Image
+                  src={product.image || "/placeholder.jpg"}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 640px) 200px, (max-width: 1024px) 300px, 400px"
+                  className="object-contain"
+                />
+              </div>
             </CardHeader>
 
             <CardContent className="p-4">
               <CardTitle className="text-lg text-[#1c1c1c]">
-                {product.name}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="inline-block max-w-[10rem] sm:max-w-[12rem] truncate" aria-label={product.name}>
+                        {product.name.length > 15 ? `${product.name.slice(0, 15)}…` : product.name}
+                      </span>
+                    </TooltipTrigger>
+                    {product.name.length > 15 && (
+                      <TooltipContent side="top">
+                        {product.name}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
               </CardTitle>
-              <CardDescription className="text-sm text-[#4a4a4a]">
-                {product.size}
+              <CardDescription className="text-sm text-[#4a4a4a] flex items-center gap-2">
+                <span>{product.size}</span>
+                {/* UOM & Case Pack inline with separators */}
+                {product.uom && (
+                  <>
+                    <span className="text-[#9b9b9b]">•</span>
+                    <span className="text-xs text-[#4a4a4a]">
+                      {product.uom === 'BOTTLE' || product.uom === 'BOTTLE'?.toUpperCase()
+                        ? 'Bottle'
+                        : product.uom === 'CAS'
+                        ? 'CAS'
+                        : product.uom}
+                    </span>
+                  </>
+                )}
+                {typeof product.casePack === 'number' && product.casePack > 0 && (
+                  <>
+                    <span className="text-[#9b9b9b]">•</span>
+                    <span className="text-xs text-[#4a4a4a]">Case: {product.casePack}</span>
+                  </>
+                )}
               </CardDescription>
 
               <div className="mt-2 space-y-1">
@@ -78,11 +113,16 @@ export function ProductCard({ products }: Props) {
                     -{product.discount}%
                   </div>
                 )}
+                {/* removed separate UOM/Case block — now inline with size */}
               </div>
             </CardContent>
 
             <CardFooter className="p-4 border-t border-[#cccccc]">
-              <ProductActions product={product} />
+              <div className="w-full flex flex-col sm:flex-row sm:justify-between gap-3">
+                <div className="flex-1">
+                  <ProductActions product={product} />
+                </div>
+              </div>
             </CardFooter>
           </Card>
         ))}

@@ -34,7 +34,8 @@ export function GalleryTable({ galleryItems }: Props) {
 
   return (
     <>
-      <div className="overflow-x-auto rounded-lg border border-[#cccccc]">
+      {/* Desktop / Tablet: table */}
+      <div className="hidden sm:block overflow-x-auto rounded-lg border border-[#cccccc]">
         <table className="min-w-full bg-[#fcfbf8]">
           <thead className="bg-[#f3ede5]">
             <tr>
@@ -94,6 +95,35 @@ export function GalleryTable({ galleryItems }: Props) {
             })}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile: card list */}
+      <div className="block sm:hidden space-y-3">
+        {currentRows.map((item) => {
+          const createdTime = new Date(item.createdAt).getTime();
+          const updatedTime = new Date(item.updatedAt).getTime();
+          const displayDate = updatedTime > createdTime ? item.updatedAt : item.createdAt;
+
+          return (
+            <div key={item.id} className="bg-[#fcfbf8] border border-[#e6e0d6] rounded-lg p-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <img src={item.thumbnail || '/placeholder.jpg'} alt={item.title} className="w-20 h-12 rounded object-cover" />
+                  <div className="min-w-0">
+                    <div className="font-medium text-[#1c1c1c] truncate">{item.title}</div>
+                    <div className="text-sm text-[#4a4a4a] truncate">{item.type}</div>
+                  </div>
+                </div>
+
+                <div className="text-sm text-[#4a4a4a]">{new Date(displayDate).toLocaleDateString()}</div>
+              </div>
+
+              <div className="mt-3">
+                <GalleryActions galleryItem={item} />
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* =====  PAGINATION  ===== */}

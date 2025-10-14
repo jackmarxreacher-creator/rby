@@ -18,7 +18,7 @@ export default async function BlogPage({
   return (
     <div className="p-6 bg-[#fcfbf8] min-h-screen">
       <div className="flex items-center justify-between p-5 shadow-lg mb-8">
-        <h1 className="text-3xl font-bold text-[#1c1c1c]">Blog Posts</h1>
+        <h1 className="text-3xl font-bold text-[#1c1c1c]"></h1>
 
         <div className="flex items-center gap-4">
           <ViewToggle current={currentView} basePath="/cms/blog" />

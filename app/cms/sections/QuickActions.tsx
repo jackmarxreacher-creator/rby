@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { UserPlus, FileText, Upload, Download } from "lucide-react";
+import Link from "next/link";
 
 export default function QuickActions() {
   return (
@@ -13,7 +14,7 @@ export default function QuickActions() {
           className="flex flex-col items-center justify-center py-6"
         >
           <UserPlus className="h-6 w-6 mb-2 text-[#be965b]" />
-          <span className="text-sm">Add Customer</span>
+          <Link href="/cms/customers/new">Add Customer</Link>
         </Button>
 
         <Button
@@ -21,7 +22,7 @@ export default function QuickActions() {
           className="flex flex-col items-center justify-center py-6"
         >
           <FileText className="h-6 w-6 mb-2 text-[#be965b]" />
-          <span className="text-sm">New Blog Post</span>
+          <Link href="/cms/blog/new">Add Post</Link>
         </Button>
 
         <Button
@@ -29,7 +30,7 @@ export default function QuickActions() {
           className="flex flex-col items-center justify-center py-6"
         >
           <Upload className="h-6 w-6 mb-2 text-[#be965b]" />
-          <span className="text-sm">Upload Media</span>
+          <Link href="/cms/gallery/new">Add Gallery Item</Link>
         </Button>
 
         <Button

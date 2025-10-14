@@ -1,61 +1,97 @@
+// app/api/auth/[...all]/route.ts
 import { auth } from "@/lib/auth";
-import { cors } from "@/lib/cors";
 import { NextRequest, NextResponse } from "next/server";
 
-const allowedOrigin = "https://rbygh.com";
+const allowedOrigin = "http://localhost:3000";   // ← http, not https
 
 async function handleRequest(req: NextRequest) {
   const response = await auth.handler(req);
 
-  const newHeaders = new Headers(response.headers);
-  newHeaders.set("Access-Control-Allow-Origin", allowedOrigin);
-  newHeaders.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  newHeaders.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  newHeaders.set("Access-Control-Allow-Credentials", "true");
+  const headers = new Headers(response.headers);
+  headers.set("Access-Control-Allow-Origin", allowedOrigin);
+  headers.set("Access-Control-Allow-Credentials", "true");
+  headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-  return new NextResponse(response.body, {
-    status: response.status,
-    headers: newHeaders,
-  });
+  return new NextResponse(response.body, { status: response.status, headers });
 }
 
+export { handleRequest as GET, handleRequest as POST, handleRequest as PUT, handleRequest as DELETE };
+
 export async function OPTIONS(req: NextRequest) {
-  const preflight = cors(req);
-  if (preflight) return preflight;
   return new NextResponse(null, {
     status: 204,
     headers: {
       "Access-Control-Allow-Origin": allowedOrigin,
+      "Access-Control-Allow-Credentials": "true",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      "Access-Control-Allow-Credentials": "true",
     },
   });
 }
 
-export async function GET(req: NextRequest) {
-  const preflight = cors(req);
-  if (preflight) return preflight;
-  return handleRequest(req);
-}
 
-export async function POST(req: NextRequest) {
-  const preflight = cors(req);
-  if (preflight) return preflight;
-  return handleRequest(req);
-}
 
-export async function PUT(req: NextRequest) {
-  const preflight = cors(req);
-  if (preflight) return preflight;
-  return handleRequest(req);
-}
+// import { auth } from "@/lib/auth";
+// import { cors } from "@/lib/cors";
+// import { NextRequest, NextResponse } from "next/server";
 
-export async function DELETE(req: NextRequest) {
-  const preflight = cors(req);
-  if (preflight) return preflight;
-  return handleRequest(req);
-}
+// //const allowedOrigin = "https://rbygh.com";
+// const allowedOrigin = "https://localhost:3000";
+
+
+// async function handleRequest(req: NextRequest) {
+//   const response = await auth.handler(req);
+
+//   const newHeaders = new Headers(response.headers);
+//   newHeaders.set("Access-Control-Allow-Origin", allowedOrigin);
+//   newHeaders.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//   newHeaders.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   newHeaders.set("Access-Control-Allow-Credentials", "true");
+
+//   return new NextResponse(response.body, {
+//     status: response.status,
+//     headers: newHeaders,
+//   });
+// }
+
+// export async function OPTIONS(req: NextRequest) {
+//   const preflight = cors(req);
+//   if (preflight) return preflight;
+//   return new NextResponse(null, {
+//     status: 204,
+//     headers: {
+//       "Access-Control-Allow-Origin": allowedOrigin,
+//       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+//       "Access-Control-Allow-Headers": "Content-Type, Authorization",
+//       "Access-Control-Allow-Credentials": "true",
+//     },
+//   });
+// }
+
+// export async function GET(req: NextRequest) {
+//   const preflight = cors(req);
+//   if (preflight) return preflight;
+//   return handleRequest(req);
+// }
+
+// export async function POST(req: NextRequest) {
+//   const preflight = cors(req);
+//   if (preflight) return preflight;
+//   return handleRequest(req);
+// }
+
+// export async function PUT(req: NextRequest) {
+//   const preflight = cors(req);
+//   if (preflight) return preflight;
+//   return handleRequest(req);
+// }
+
+// export async function DELETE(req: NextRequest) {
+//   const preflight = cors(req);
+//   if (preflight) return preflight;
+//   return handleRequest(req);
+// }
 
 
 

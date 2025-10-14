@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { ProductActions } from "./ProductActions";
 import type { Product } from "@prisma/client"; // ← import type
+import { labelForCategory } from "@/lib/category";
 
 interface Props {
   products: Product[];
@@ -13,6 +14,7 @@ const ITEMS_PER_PAGE = 8;
 
 export function ProductTable({ products }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
   const currentRows = useMemo(() => {
@@ -32,10 +34,27 @@ export function ProductTable({ products }: Props) {
           <thead className="bg-[#f3ede5]">
             <tr>
               <th className="px-4 py-2 text-left text-sm font-semibold text-[#1c1c1c]">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4"
+                  checked={selectedIds.length > 0 && currentRows.every(r => selectedIds.includes(r.id))}
+                  onChange={(e) => {
+                    if (e.currentTarget.checked) {
+                      setSelectedIds((prev) => Array.from(new Set([...prev, ...currentRows.map(r => r.id)])));
+                    } else {
+                      setSelectedIds((prev) => prev.filter(id => !currentRows.some(r => r.id === id)));
+                    }
+                  }}
+                />
+              </th>
+              <th className="px-4 py-2 text-left text-sm font-semibold text-[#1c1c1c]">
                 Image
               </th>
               <th className="px-4 py-2 text-left text-sm font-semibold text-[#1c1c1c]">
                 Name
+              </th>
+              <th className="px-4 py-2 text-left text-sm font-semibold text-[#1c1c1c]">
+                Category
               </th>
               <th className="px-4 py-2 text-left text-sm font-semibold text-[#1c1c1c]">
                 Size
@@ -47,6 +66,12 @@ export function ProductTable({ products }: Props) {
                 Retail
               </th>
               <th className="px-4 py-2 text-left text-sm font-semibold text-[#1c1c1c]">
+                UOM
+              </th>
+              <th className="px-4 py-2 text-left text-sm font-semibold text-[#1c1c1c]">
+                Case Pack
+              </th>
+              <th className="px-4 py-2 text-left text-sm font-semibold text-[#1c1c1c]">
                 Actions
               </th>
             </tr>
@@ -54,6 +79,17 @@ export function ProductTable({ products }: Props) {
           <tbody className="divide-y divide-[#cccccc]">
             {currentRows.map((p) => (
               <tr key={p.id} className="hover:bg-[#f3ede5]/50">
+                <td className="px-4 py-2">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4"
+                    checked={selectedIds.includes(p.id)}
+                    onChange={(e) => {
+                      if (e.currentTarget.checked) setSelectedIds((prev) => [...prev, p.id]);
+                      else setSelectedIds((prev) => prev.filter(id => id !== p.id));
+                    }}
+                  />
+                </td>
                 <td className="p-2">
                   <Image
                     src={p.image || "/placeholder.jpg"}
@@ -66,6 +102,7 @@ export function ProductTable({ products }: Props) {
                 <td className="px-4 py-2 text-sm text-[#1c1c1c] font-medium">
                   {p.name}
                 </td>
+                <td className="px-4 py-2 text-sm text-[#4a4a4a]">{labelForCategory(p.category)}</td>
                 <td className="px-4 py-2 text-sm text-[#4a4a4a]">{p.size}</td>
                 <td className="px-4 py-2 text-sm text-[#9b7c4a] font-medium">
                   GHS {p.wholesalePrice}
@@ -73,6 +110,8 @@ export function ProductTable({ products }: Props) {
                 <td className="px-4 py-2 text-sm text-[#be965b] font-semibold">
                   GHS {p.retailPrice}
                 </td>
+                <td className="px-4 py-2 text-sm text-[#4a4a4a]">{(p as any).uom ?? '-'}</td>
+                <td className="px-4 py-2 text-sm text-[#4a4a4a]">{typeof (p as any).casePack === 'number' ? (p as any).casePack : '-'}</td>
                 <td className="px-4 py-2">
                   <ProductActions product={p} />
                 </td>

@@ -13,6 +13,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import LogoSpinner from "@/components/ui/LogoSpinner"; // import spinner component
 
 export default function CmsLoginPage() {
   const [email, setEmail] = useState("");
@@ -33,10 +34,10 @@ export default function CmsLoginPage() {
 
     if (error) {
       setErr(error.message || "Login failed");
+      setLoading(false);
     } else {
       router.push("/cms");
     }
-    setLoading(false);
   };
 
   return (
@@ -64,6 +65,7 @@ export default function CmsLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
               />
             </div>
 
@@ -75,6 +77,7 @@ export default function CmsLoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
               />
             </div>
 
@@ -85,7 +88,7 @@ export default function CmsLoginPage() {
               disabled={loading}
               className="w-full bg-[#be965b] hover:bg-yellow-600 text-white"
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? <LogoSpinner /> : "Login"}
             </Button>
           </form>
         </CardContent>
@@ -93,6 +96,106 @@ export default function CmsLoginPage() {
     </div>
   );
 }
+
+
+
+
+
+// "use client";
+
+// import { useState } from "react";
+// import { useRouter } from "next/navigation";
+// import { authClient } from "@/lib/auth-client"; // ① import the client
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardHeader,
+//   CardTitle,
+// } from "@/components/ui/card";
+// import { Label } from "@/components/ui/label";
+// import { Input } from "@/components/ui/input";
+// import { Button } from "@/components/ui/button";
+
+// export default function CmsLoginPage() {
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [loading, setLoading] = useState(false);
+//   const [err, setErr] = useState<string | null>(null);
+//   const router = useRouter();
+
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     setErr(null);
+//     setLoading(true);
+
+//     const { data, error } = await authClient.signIn.email({
+//       email,
+//       password,
+//     });
+
+//     if (error) {
+//       setErr(error.message || "Login failed");
+//     } else {
+//       router.push("/cms");
+//     }
+//     setLoading(false);
+//   };
+
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-[#faf9f6]">
+//       <Card className="w-full max-w-md border border-gray-200 shadow-lg">
+//         <CardHeader className="text-center">
+//           <img
+//             src="/images/logos/rby_color_logo.webp"
+//             alt="RBY Logo"
+//             className="h-12 w-12 mx-auto mb-3"
+//           />
+//           <CardTitle className="text-xl font-bold text-gray-800">
+//             RBY CMS Login
+//           </CardTitle>
+//           <CardDescription>Please sign in to continue</CardDescription>
+//         </CardHeader>
+
+//         <CardContent>
+//           <form onSubmit={handleSubmit} className="space-y-5">
+//             <div className="space-y-2">
+//               <Label htmlFor="email">Email</Label>
+//               <Input
+//                 id="email"
+//                 type="email"
+//                 required
+//                 value={email}
+//                 onChange={(e) => setEmail(e.target.value)}
+//               />
+//             </div>
+
+//             <div className="space-y-2">
+//               <Label htmlFor="password">Password</Label>
+//               <Input
+//                 id="password"
+//                 type="password"
+//                 required
+//                 value={password}
+//                 onChange={(e) => setPassword(e.target.value)}
+//               />
+//             </div>
+
+//             {err && <p className="text-sm text-red-500">{err}</p>}
+
+//             <Button
+//               type="submit"
+//               disabled={loading}
+//               className="w-full bg-[#be965b] hover:bg-yellow-600 text-white"
+//             >
+//               {loading ? "Logging in..." : "Login"}
+//             </Button>
+//           </form>
+//         </CardContent>
+//       </Card>
+//     </div>
+//   );
+// }
 
 
 

@@ -4,6 +4,7 @@
 import { useRouter } from "next/navigation";
 import CustomerForm from "../_components/CustomerForm";
 import { updateCustomer } from "../actions";
+import { useServerAction } from "@/lib/use-server-action";
 
 interface Props {
   customer: any;
@@ -12,9 +13,11 @@ interface Props {
 export function EditCustomerClient({ customer }: Props) {
   const router = useRouter();
 
+  const wrappedUpdate = useServerAction(updateCustomer);
+
   async function handleUpdate(data: FormData) {
-    await updateCustomer(customer.id, data);
-    router.push("/cms/customers");
+    const res = await wrappedUpdate(customer.id, data);
+    if (res?.ok) router.push("/cms/customers");
   }
 
   /* ✅ correct prop name expected by CustomerForm */

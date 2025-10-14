@@ -19,7 +19,6 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("admin@rby.com");
   const [password, setPassword] = useState("ChangeMe!123");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [role, setRole] = useState<"ADMIN" | "EDITOR" | "VIEWER">("ADMIN");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const router = useRouter();
@@ -29,22 +28,27 @@ export default function RegisterPage() {
     setErr(null);
     setLoading(true);
 
-    // 1. phoneNumber is NOT accepted by signUp.email()
+  // 1.  create user (no role assigned by client; roles are assigned by admins)
     const { data, error } = await authClient.signUp.email({
       email,
       password,
       name,
-      // image, callbackURL, fetchOptions are the only other allowed fields
     });
 
     if (error) {
-      setErr(error.message || "Sign up failed");
-    } else {
-      // 2. There is NO client-side organisation role setter.
-      //    Set the role server-side (hook / admin panel) instead.
-      console.log(`User created → id: ${data.user.id}`);
-      router.push("/login");
+      setErr(error.message || "Sign-up failed");
+      setLoading(false);
+      return;
     }
+
+    // 2.  server-side: force role to ADMIN (super-user only)
+    await fetch("/api/set-admin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: data.user.id }),
+    });
+
+    router.push("/login");
     setLoading(false);
   };
 
@@ -52,87 +56,20 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#faf9f6]">
       <Card className="w-full max-w-md border border-gray-200 shadow-lg">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl font-bold text-gray-800">
-            Create Account
-          </CardTitle>
-          <CardDescription>
-            Enter your details to get started.
-          </CardDescription>
+          <CardTitle className="text-xl font-bold text-gray-800">Create Super-User</CardTitle>
+          <CardDescription>Enter details for the admin account.</CardDescription>
         </CardHeader>
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Name */}
-            <div className="space-y-1">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
+            <div className="space-y-1"><Label>Name</Label><Input required value={name} onChange={(e) => setName(e.target.value)} /></div>
+            <div className="space-y-1"><Label>Email</Label><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+            <div className="space-y-1"><Label>Password</Label><Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+            <div className="space-y-1"><Label>Phone Number (optional)</Label><Input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} /></div>
 
-            {/* Email */}
-            <div className="space-y-1">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-
-            {/* Password */}
-            <div className="space-y-1">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-
-            {/* Phone Number (optional - NOT sent to API) */}
-            <div className="space-y-1">
-              <Label htmlFor="phone">Phone Number (optional)</Label>
-              <Input
-                id="phone"
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-              />
-            </div>
-
-            {/* Role selector (for display only) */}
-            <div className="space-y-1">
-              <Label htmlFor="role">Role</Label>
-              <select
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value as any)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
-              >
-                <option value="VIEWER">Viewer</option>
-                <option value="EDITOR">Editor</option>
-                <option value="ADMIN">Admin</option>
-              </select>
-            </div>
-
-            {/* Error */}
             {err && <p className="text-sm text-red-500">{err}</p>}
-
-            {/* Submit */}
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#be965b] hover:bg-yellow-600 text-white"
-            >
-              {loading ? "Creating..." : "Create Account"}
+            <Button type="submit" disabled={loading} className="w-full bg-[#be965b] hover:bg-yellow-600 text-white">
+              {loading ? "Creating..." : "Create Super-User"}
             </Button>
           </form>
         </CardContent>
@@ -140,6 +77,152 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+
+
+
+// "use client";
+
+// import { useState } from "react";
+// import { useRouter } from "next/navigation";
+// import { authClient } from "@/lib/auth-client";
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardHeader,
+//   CardTitle,
+// } from "@/components/ui/card";
+// import { Label } from "@/components/ui/label";
+// import { Input } from "@/components/ui/input";
+// import { Button } from "@/components/ui/button";
+
+// export default function RegisterPage() {
+//   const [name, setName] = useState("");
+//   const [email, setEmail] = useState("admin@rby.com");
+//   const [password, setPassword] = useState("ChangeMe!123");
+//   const [phoneNumber, setPhoneNumber] = useState("");
+//   const [role, setRole] = useState<"ADMIN" | "EDITOR" | "VIEWER">("ADMIN");
+//   const [loading, setLoading] = useState(false);
+//   const [err, setErr] = useState<string | null>(null);
+//   const router = useRouter();
+
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     setErr(null);
+//     setLoading(true);
+
+  // const [role, setRole] = useState<"ADMIN" | "EDITOR" | "VIEWER">("ADMIN"); // Role selection removed: client sign-up no longer assigns a role.
+//     const { data, error } = await authClient.signUp.email({
+//       email,
+//       password,
+//       name,
+//       // image, callbackURL, fetchOptions are the only other allowed fields
+//     });
+
+//     if (error) {
+//       setErr(error.message || "Sign up failed");
+//     } else {
+//       // 2. There is NO client-side organisation role setter.
+//       //    Set the role server-side (hook / admin panel) instead.
+//       console.log(`User created → id: ${data.user.id}`);
+//       router.push("/login");
+//     }
+//     setLoading(false);
+//   };
+
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-[#faf9f6]">
+//       <Card className="w-full max-w-md border border-gray-200 shadow-lg">
+//         <CardHeader className="text-center">
+//           <CardTitle className="text-xl font-bold text-gray-800">
+//             Create Account
+//           </CardTitle>
+//           <CardDescription>
+//             Enter your details to get started.
+//           </CardDescription>
+//         </CardHeader>
+
+//         <CardContent>
+//           <form onSubmit={handleSubmit} className="space-y-4">
+//             {/* Name */}
+//             <div className="space-y-1">
+//               <Label htmlFor="name">Name</Label>
+//               <Input
+//                 id="name"
+//                 required
+//                 value={name}
+//                 onChange={(e) => setName(e.target.value)}
+//               />
+//             </div>
+
+//             {/* Email */}
+//             <div className="space-y-1">
+//               <Label htmlFor="email">Email</Label>
+//               <Input
+//                 id="email"
+//                 type="email"
+//                 required
+//                 value={email}
+//                 onChange={(e) => setEmail(e.target.value)}
+//               />
+//             </div>
+
+//             {/* Password */}
+//             <div className="space-y-1">
+//               <Label htmlFor="password">Password</Label>
+//               <Input
+//                 id="password"
+//                 type="password"
+//                 required
+//                 value={password}
+//                 onChange={(e) => setPassword(e.target.value)}
+//               />
+//             </div>
+
+//             {/* Phone Number (optional - NOT sent to API) */}
+//             <div className="space-y-1">
+//               <Label htmlFor="phone">Phone Number (optional)</Label>
+//               <Input
+//                 id="phone"
+//                 type="tel"
+//                 value={phoneNumber}
+//                 onChange={(e) => setPhoneNumber(e.target.value)}
+//               />
+//             </div>
+
+//             {/* Role selector (for display only) */}
+//             <div className="space-y-1">
+//               <Label htmlFor="role">Role</Label>
+//               <select
+//                 id="role"
+//                 value={role}
+//                 onChange={(e) => setRole(e.target.value as any)}
+//                 className="w-full border border-gray-300 rounded-md px-3 py-2"
+//               >
+//                 <option value="VIEWER">Viewer</option>
+//                 <option value="EDITOR">Editor</option>
+//                 <option value="ADMIN">Admin</option>
+//               </select>
+//             </div>
+
+//             {/* Error */}
+//             {err && <p className="text-sm text-red-500">{err}</p>}
+
+//             {/* Submit */}
+//             <Button
+//               type="submit"
+//               disabled={loading}
+//               className="w-full bg-[#be965b] hover:bg-yellow-600 text-white"
+//             >
+//               {loading ? "Creating..." : "Create Account"}
+//             </Button>
+//           </form>
+//         </CardContent>
+//       </Card>
+//     </div>
+//   );
+// }
 
 
 

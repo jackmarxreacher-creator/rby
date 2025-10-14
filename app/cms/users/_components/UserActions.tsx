@@ -1,6 +1,8 @@
 "use client";
 
 import { deleteUser } from "../actions";
+import { useServerAction } from "@/lib/use-server-action";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,9 +26,15 @@ interface Props {
 export function UserActions({ user }: Props) {
   const [open, setOpen] = useState(false);
 
+  const router = useRouter();
+  const wrappedDelete = useServerAction(deleteUser as any);
+
   const handleDelete = async () => {
-    await deleteUser(user.id);
-    setOpen(false);
+    const res = await wrappedDelete(user.id);
+    if (res.ok) {
+      setOpen(false);
+      router.refresh();
+    }
   };
 
   return (

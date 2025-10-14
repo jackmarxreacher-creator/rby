@@ -2,10 +2,21 @@
 import { createRequest } from "@/app/cms/requests/actions";
 
 export async function submitRequest(data: FormData) {
-  // 1️⃣  create the order
-  await createRequest(data);
+  // 1️⃣  create the order (guest flag = true)
+  await createRequest(data, true);
   // 2️⃣  NO redirect – client will show appreciation card + countdown → home
 }
+
+
+
+// "use server";
+// import { createRequest } from "@/app/cms/requests/actions";
+
+// export async function submitRequest(data: FormData) {
+//   // 1️⃣  create the order
+//   await createRequest(data);
+//   // 2️⃣  NO redirect – client will show appreciation card + countdown → home
+// }
 
 
 

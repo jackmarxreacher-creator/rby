@@ -1,10 +1,9 @@
-import { createUser } from "../actions";
-import { UserForm } from "../_components/UserForm";
+import UserFormWrapper from "../_components/UserFormWrapper";
 
 export default async function NewUserPage() {
   return (
     <div className="p-6 max-w-2xl mx-auto">
-      <UserForm onSave={createUser} />
+      <UserFormWrapper />
     </div>
   );
 }

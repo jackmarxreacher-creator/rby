@@ -10,6 +10,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { CustomerActions } from "./CustomerActions";
+import Link from "next/link";
 import Image from "next/image"; // ← already imported
 
 interface Props {
@@ -44,51 +45,52 @@ export default function CustomerCard({ customers }: Props) {
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {currentRows.map((c) => (
-          <Card
-            key={c.id}
-            className="bg-[#fcfbf8] border border-[#cccccc] rounded-xl shadow-sm hover:shadow-lg"
-          >
-            <CardHeader>
-              {/* NEW – customer avatar */}
-              <div className="flex items-center space-x-3 mb-2">
-                <Image
-                  src={c.image ?? "/images/user.jpg"}
-                  alt={c.name}
-                  width={40}
-                  height={40}
-                  className="rounded-full object-cover"
-                />
-                <div>
-                  <CardTitle className="text-lg text-[#1c1c1c]">{c.name}</CardTitle>
-                  <CardDescription className="text-sm text-[#4a4a4a]">
-                    {c.email}
-                  </CardDescription>
+          <div key={c.id} className="px-4 sm:px-0">
+            <Card className="mx-auto w-full max-w-[360px] sm:mx-0 sm:max-w-none bg-[#fcfbf8] border border-[#cccccc] rounded-xl shadow-sm hover:shadow-lg">
+              <CardHeader className="mb-2">
+                {/* Avatar + title - center on mobile, inline on sm+ */}
+                <div className="flex flex-col items-center text-center sm:flex-row sm:items-center sm:space-x-3">
+                  <Image
+                    src={c.image ?? "/images/user.jpg"}
+                    alt={c.name}
+                    width={40}
+                    height={40}
+                    unoptimized
+                    onError={(e) => {
+                      const img = e.currentTarget as HTMLImageElement
+                      if (img && img.src.indexOf("/images/user.jpg") === -1) img.src = "/images/user.jpg"
+                    }}
+                    className="rounded-full object-cover"
+                  />
+
+                  <div className="mt-2 sm:mt-0">
+                    <CardTitle className="text-lg text-[#1c1c1c]"><Link href={`/cms/customers/${c.id}/view`}>{c.name}</Link></CardTitle>
+                    <CardDescription className="text-sm text-[#4a4a4a] truncate">{c.email}</CardDescription>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
+              </CardHeader>
 
-            <CardContent>
-              {c.businessName && (
-                <p className="text-sm text-[#4a4a4a]">
-                  Business Name:{" "}
-                  <span className="font-medium text-[#be965b]">{c.businessName}</span>
-                </p>
-              )}
-              {c.businessType && (
-                <p className="text-sm text-[#4a4a4a] mt-1">
-                  Business Type:{" "}
-                  <span className="font-medium text-[#be965b]">{c.businessType}</span>
-                </p>
-              )}
-              {c.phone && (
-                <p className="text-sm text-[#4a4a4a] mt-1">Phone: {c.phone}</p>
-              )}
-            </CardContent>
+              <CardContent className="text-center sm:text-left">
+                {c.businessName && (
+                  <p className="text-sm text-[#4a4a4a]">
+                    Business Name: <span className="font-medium text-[#be965b]">{c.businessName}</span>
+                  </p>
+                )}
+                {c.businessType && (
+                  <p className="text-sm text-[#4a4a4a] mt-1">
+                    Business Type: <span className="font-medium text-[#be965b]">{c.businessType}</span>
+                  </p>
+                )}
+                {c.phone && (
+                  <p className="text-sm text-[#4a4a4a] mt-1">Phone: {c.phone}</p>
+                )}
+              </CardContent>
 
-            <CardFooter>
-              <CustomerActions customer={c} />
-            </CardFooter>
-          </Card>
+              <CardFooter className="flex justify-center sm:justify-start">
+                <CustomerActions customer={c} />
+              </CardFooter>
+            </Card>
+          </div>
         ))}
       </div>
 

@@ -1,16 +1,10 @@
-// COMMENTED OUT ORIGINAL CODE WITH UNUSED IMPORT
-// import Image from "next/image";
-// import styles from "./page.module.css";
-// import { blogPosts } from "@/data/blogPosts";
-
-// FIXED VERSION - REMOVED UNUSED STYLES IMPORT
+// app/page.tsx
 import Image from "next/image";
-import { blogPosts } from "@/data/blogPosts";
 import Hero from "@/app/sections/Hero";
 import Welcome from "./sections/Welcome";
 import Intro from "./sections/Intro";
 import Testimonials from "./sections/Testimonials";
-import BlogPreview from "./sections/BlogPreview";
+import BlogPreviewWrapper from "./sections/BlogPreviewWrapper"; // ← NEW
 import Brands from "./sections/RbyBrands";
 
 export default function Home() {
@@ -20,8 +14,39 @@ export default function Home() {
       <Welcome />
       <Intro />
       <Testimonials />
-      <BlogPreview posts={blogPosts.slice(0, 3)}/>
+      <BlogPreviewWrapper /> {/* ← fetches latest 3 published posts */}
       <Brands />
     </main>
   );
 }
+
+
+
+
+// // COMMENTED OUT ORIGINAL CODE WITH UNUSED IMPORT
+// // import Image from "next/image";
+// // import styles from "./page.module.css";
+// // import { blogPosts } from "@/data/blogPosts";
+
+// // FIXED VERSION - REMOVED UNUSED STYLES IMPORT
+// import Image from "next/image";
+// import { blogPosts } from "@/data/blogPosts";
+// import Hero from "@/app/sections/Hero";
+// import Welcome from "./sections/Welcome";
+// import Intro from "./sections/Intro";
+// import Testimonials from "./sections/Testimonials";
+// import BlogPreview from "./sections/BlogPreview";
+// import Brands from "./sections/RbyBrands";
+
+// export default function Home() {
+//   return (
+//     <main>
+//       <Hero />
+//       <Welcome />
+//       <Intro />
+//       <Testimonials />
+//       <BlogPreview posts={blogPosts.slice(0, 3)}/>
+//       <Brands />
+//     </main>
+//   );
+// }

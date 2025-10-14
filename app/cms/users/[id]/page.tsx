@@ -1,6 +1,6 @@
 // app/cms/users/[id]/page.tsx
 import { prisma } from "@/lib/prisma";
-import { UserForm } from "../_components/UserForm";
+import UserEditFormWrapper from "../_components/UserEditFormWrapper";
 import { redirect } from "next/navigation";
 import { updateUser } from "../actions";
 
@@ -9,7 +9,13 @@ interface User {
   name: string;
   email: string;
   phoneNumber: string | null;
-  role: "ADMIN" | "EDITOR" | "VIEWER";
+  role: "ADMIN" | "EDITOR" | "MANAGER" | "STAFF";
+  department?:
+    | "Administration"
+    | "Finance"
+    | "HR"
+    | "Sales"
+    | "Warehouse";
 }
 
 export default async function UserEditPage({
@@ -27,17 +33,16 @@ export default async function UserEditPage({
       email: true,
       phoneNumber: true,
       role: true,
+      department: true,
     },
   });
 
   if (!user) redirect("/cms/users");
 
-  const boundUpdateUser = updateUser.bind(null, id);
-
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Edit User</h1>
-      <UserForm initial={user as User} onSave={boundUpdateUser} />
+      <UserEditFormWrapper id={id} initial={user} />
     </div>
   );
 }

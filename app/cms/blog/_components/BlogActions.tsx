@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Eye, Edit, Trash } from "lucide-react";
 import { removeBlogPost } from "../actions";
+import { useServerAction } from "@/lib/use-server-action";
 
 interface Props {
   post: { id: string; slug: string };
@@ -18,10 +19,11 @@ interface Props {
 export function BlogActions({ post }: Props) {
   const router = useRouter();
 
+  const wrappedDelete = useServerAction(removeBlogPost);
   const handleDelete = async () => {
     if (!confirm("Delete this post?")) return;
-    await removeBlogPost(post.id);
-    router.refresh();
+    const res = await wrappedDelete(post.id);
+    if (res?.ok) router.refresh();
   };
 
   return (

@@ -1,6 +1,7 @@
 // app/cms/requests/[id]/page.tsx
 import { notFound } from "next/navigation";
 import OrderForm from "../_components/OrderForm";
+import RequestEditFormWrapper from "../_components/RequestEditFormWrapper";
 import { updateRequest, getProducts } from "../actions";
 import { prisma } from "@/lib/prisma";
 import { getAuth } from "@/lib/auth";
@@ -27,19 +28,10 @@ export default async function EditRequestPage({ params }: PageProps) {
   /* hoist the userId so the closure is guaranteed to see it */
   const userId = session.user.id;
 
-  async function handleUpdate(data: FormData) {
-    "use server";
-    await updateRequest(id, data, userId); // ✅ no null path here
-  }
-
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-6">Edit Request</h1>
-      <OrderForm
-        initialRequest={request}
-        products={products}
-        action={handleUpdate}
-      />
+      <RequestEditFormWrapper id={id} initialRequest={request} products={products} />
     </div>
   );
 }

@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { deleteRequest } from "../actions";
+import { useServerAction } from "@/lib/use-server-action";
 
 interface Props {
   request: {
@@ -27,10 +28,14 @@ export function RequestAction({ request }: Props) {
 
   const handleEdit = () => router.push(`/cms/requests/${request.id}`);
 
+  const wrappedDelete = useServerAction(deleteRequest as any);
+
   const handleDelete = async () => {
-    await deleteRequest(request.id);
-    setOpen(false);
-    router.refresh();
+    const res = await wrappedDelete(request.id);
+    if (res.ok) {
+      setOpen(false);
+      router.refresh();
+    }
   };
 
   return (

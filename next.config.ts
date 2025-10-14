@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* existing config options */
+  // Webpack alias to resolve 'emitter' -> 'events' for html-pdf-node dependencies
+  webpack(config) {
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      emitter: "events",
+    };
+    return config;
+  },
 
   async headers() {
     return [
@@ -10,7 +18,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: "frame-src https://www.google.com https://maps.google.com;",
+            value: "frame-src https://www.google.com https://maps.google.com ;",
           },
         ],
       },
@@ -19,6 +27,31 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+
+
+
+// import type { NextConfig } from "next";
+
+// const nextConfig: NextConfig = {
+//   /* existing config options */
+
+//   async headers() {
+//     return [
+//       {
+//         source: "/contact",
+//         headers: [
+//           {
+//             key: "Content-Security-Policy",
+//             value: "frame-src https://www.google.com https://maps.google.com;",
+//           },
+//         ],
+//       },
+//     ];
+//   },
+// };
+
+// export default nextConfig;
 
 
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -27,7 +28,8 @@ interface Props {
 
 export default function GalleryGrid({ galleryItems }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [filter, setFilter] = useState<FilterType>("all");
+  const searchParams = useSearchParams();
+  const [filter, setFilter] = useState<FilterType>((searchParams?.get("filter") as FilterType) || "all");
   const [lightboxIndex, setLightboxIndex] = useState(-1);
 
   const itemsPerPage = 12;
@@ -41,10 +43,12 @@ export default function GalleryGrid({ galleryItems }: Props) {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = filteredItems.slice(startIndex, startIndex + itemsPerPage);
 
-  const handleFilterChange = (type: FilterType) => {
-    setFilter(type);
+  // keep internal filter in sync with URL param changes
+  useEffect(() => {
+    const urlFilter = (searchParams?.get("filter") as FilterType) || "all";
+    setFilter(urlFilter);
     setCurrentPage(1);
-  };
+  }, [searchParams]);
 
   // Map items into Lightbox format
   const lightboxSlides = currentItems.map((item) =>
@@ -70,16 +74,11 @@ export default function GalleryGrid({ galleryItems }: Props) {
   );
 
   return (
-    <section className="py-16 px-4 md:px-8 bg-[#fcfbf8]">
+    <section className="py-8 px-4 md:px-8 bg-[#fcfbf8]">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-8 text-[#be965b]">Our Gallery</h2>
+        {/* <h2 className="text-3xl font-bold text-center mb-8 text-[#be965b]">Our Gallery</h2> */}
 
-        {/* Filter Buttons */}
-        <div className="flex justify-center space-x-4 mb-10">
-          <Button variant={filter === "all" ? "default" : "outline"} onClick={() => handleFilterChange("all")}>All</Button>
-          <Button variant={filter === "photo" ? "default" : "outline"} onClick={() => handleFilterChange("photo")}>Photos</Button>
-          <Button variant={filter === "video" ? "default" : "outline"} onClick={() => handleFilterChange("video")}>Videos</Button>
-        </div>
+        {/* Filter Buttons moved to page header (FilterControls) */}
 
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -93,7 +92,9 @@ export default function GalleryGrid({ galleryItems }: Props) {
               onClick={() => setLightboxIndex(idx)}
             >
               {item.type === "photo" ? (
-                <Image src={item.thumbnail} alt={item.title} width={400} height={250} className="w-full h-48 object-cover" />
+                <div className="relative w-full h-48">
+                  <Image src={item.thumbnail} alt={item.title} fill className="object-cover" />
+                </div>
               ) : (
                 <div className="relative">
                   <video

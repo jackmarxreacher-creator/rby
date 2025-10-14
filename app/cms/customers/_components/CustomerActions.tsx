@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteCustomer } from "../actions"; // Import your customer server action
+import { useServerAction } from "@/lib/use-server-action";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,9 +18,10 @@ import { useState } from "react";
 export function CustomerActions({ customer }: { customer: any }) {
   const [open, setOpen] = useState(false);
 
+  const wrappedDelete = useServerAction(deleteCustomer);
   const handleDelete = async () => {
-    await deleteCustomer(customer.id);
-    setOpen(false);
+    const res = await wrappedDelete(customer.id);
+    if (res?.ok) setOpen(false);
   };
 
   return (
