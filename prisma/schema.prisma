@@ -16,7 +16,7 @@ model User {
   emailVerified Boolean   @default(false)
   image         String?
   phoneNumber   String?   @unique
-  role          Role?
+  role          StaffRole?
   department    Department?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -221,7 +221,7 @@ model UserActivityLog {
 }
 
 // ------------------  ENUMS  ------------------
-enum Role {
+enum StaffRole {
   ADMIN
   EDITOR
   MANAGER

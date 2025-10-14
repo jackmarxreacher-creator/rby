@@ -26,14 +26,14 @@ async function uploadImage(file: File | undefined) {
 }
 
 // Zod enums matching prisma
-const RoleEnum = z.enum(["ADMIN", "EDITOR", "MANAGER", "STAFF"]);
+const StaffRoleEnum = z.enum(["ADMIN", "EDITOR", "MANAGER", "STAFF"]);
 const DepartmentEnum = z.enum(["Administration", "Finance", "HR", "Sales", "Warehouse"]);
 
 const userSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   password: z.string().min(6).optional(),
-  role: RoleEnum.optional(),
+  role: StaffRoleEnum.optional(),
   phoneNumber: z.string().optional(),
   department: DepartmentEnum.optional(),
   image: z.any().optional(),
