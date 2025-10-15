@@ -1,23 +1,27 @@
 import { cookies } from "next/headers";
-import { auth } from "@/lib/auth";
+import { auth, getAuth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import { IdleLogout } from "./components/IdleLogout";
 
 export default async function CmsLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = await cookies();
-  const headers = new Headers({ cookie: cookieStore.toString() });
+  try {
+    console.log("CMS Layout - Checking session...");
+    
+    // Use the getAuth helper function
+    const session = await getAuth();
+    
+    console.log("CMS Layout - Session result:", session);
 
-  console.log("CMS Layout - Cookies:", cookieStore.toString().substring(0, 100) + "...");
-  
-  const session = await auth.api.getSession({ headers });
-  
-  console.log("CMS Layout - Session:", session ? "Found" : "Not found");
-  console.log("CMS Layout - Session details:", session);
+    if (!session?.user) {
+      console.log("No valid session found, redirecting to login");
+      redirect("/login");
+    }
 
-  if (!session) {
-    console.log("No session found, redirecting to login");
+    console.log("Valid session found for user:", session.user.email);
+  } catch (error) {
+    console.error("CMS Layout - Error checking session:", error);
     redirect("/login");
   }
 
