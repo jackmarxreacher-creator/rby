@@ -42,8 +42,8 @@ export default function CmsLoginPage() {
         setLoading(false);
       } else {
         console.log("Login successful, redirecting...");
-        // Success - redirect to CMS
-        router.push("/cms");
+        // Force a page refresh to ensure session cookies are properly set
+        window.location.href = "/cms";
         // Note: don't set loading to false here as we're redirecting
       }
     } catch (error) {
