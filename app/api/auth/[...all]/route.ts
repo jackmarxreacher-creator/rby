@@ -2,13 +2,21 @@
 import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
-const allowedOrigin = "http://localhost:3000";   // ← http, not https
+const allowedOrigins = ["https://www.rbygh.com", "https://rbygh.com", "http://localhost:3000"];
+
+function getAllowedOrigin(requestOrigin: string | null): string {
+  if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
+    return requestOrigin;
+  }
+  return "https://www.rbygh.com"; // default to www version
+}
 
 async function handleRequest(req: NextRequest) {
   const response = await auth.handler(req);
+  const origin = getAllowedOrigin(req.headers.get("origin"));
 
   const headers = new Headers(response.headers);
-  headers.set("Access-Control-Allow-Origin", allowedOrigin);
+  headers.set("Access-Control-Allow-Origin", origin);
   headers.set("Access-Control-Allow-Credentials", "true");
   headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -19,10 +27,12 @@ async function handleRequest(req: NextRequest) {
 export { handleRequest as GET, handleRequest as POST, handleRequest as PUT, handleRequest as DELETE };
 
 export async function OPTIONS(req: NextRequest) {
+  const origin = getAllowedOrigin(req.headers.get("origin"));
+  
   return new NextResponse(null, {
     status: 204,
     headers: {
-      "Access-Control-Allow-Origin": allowedOrigin,
+      "Access-Control-Allow-Origin": origin,
       "Access-Control-Allow-Credentials": "true",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",

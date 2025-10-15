@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const allowedOrigin = 'https://rbygh.com';
+const allowedOrigins = ['https://www.rbygh.com', 'https://rbygh.com', 'http://localhost:3000'];
+
+function getAllowedOrigin(requestOrigin: string | null): string {
+  if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
+    return requestOrigin;
+  }
+  return 'https://www.rbygh.com'; // default to www version
+}
 
 export function cors(req: NextRequest): NextResponse | null {
   if (req.method === 'OPTIONS') {
+    const origin = getAllowedOrigin(req.headers.get('origin'));
+    
     return new NextResponse(null, {
       status: 204,
       headers: {
-        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Origin': origin,
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Allow-Credentials': 'true',
