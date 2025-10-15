@@ -41,28 +41,11 @@ export default function CmsLoginPage() {
         setErr(error.message || "Login failed");
         setLoading(false);
       } else {
-        console.log("Login successful, checking session...");
+        console.log("Login successful, data:", data);
         
-        // Wait a moment for session to be established, then verify it
-        setTimeout(async () => {
-          try {
-            const sessionCheck = await authClient.getSession();
-            console.log("Session check:", sessionCheck);
-            
-            if (sessionCheck.data) {
-              console.log("Session confirmed, redirecting to CMS...");
-              window.location.href = "/cms";
-            } else {
-              console.log("No session found, retrying...");
-              setErr("Login successful but session not established. Please try again.");
-              setLoading(false);
-            }
-          } catch (sessionError) {
-            console.error("Session check failed:", sessionError);
-            setErr("Login successful but couldn't establish session. Please try again.");
-            setLoading(false);
-          }
-        }, 1000);
+        // Try immediate redirect first - Better Auth should have set cookies
+        console.log("Redirecting to CMS...");
+        window.location.href = "/cms";
       }
     } catch (error) {
       setErr("Network error. Please try again.");

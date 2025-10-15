@@ -9,9 +9,17 @@ export default async function CmsLayout({ children }: { children: React.ReactNod
   const cookieStore = await cookies();
   const headers = new Headers({ cookie: cookieStore.toString() });
 
+  console.log("CMS Layout - Cookies:", cookieStore.toString().substring(0, 100) + "...");
+  
   const session = await auth.api.getSession({ headers });
+  
+  console.log("CMS Layout - Session:", session ? "Found" : "Not found");
+  console.log("CMS Layout - Session details:", session);
 
-  if (!session) redirect("/login");
+  if (!session) {
+    console.log("No session found, redirecting to login");
+    redirect("/login");
+  }
 
   return (
     <div className="flex h-screen bg-[#faf9f6]">
