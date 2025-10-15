@@ -43,9 +43,9 @@ export default function CmsLoginPage() {
       } else {
         console.log("Login successful, data:", data);
         
-        // Try immediate redirect first - Better Auth should have set cookies
-        console.log("Redirecting to CMS...");
-        window.location.href = "/cms";
+        // Redirect to test session page first to debug
+        console.log("Redirecting to test session page...");
+        window.location.href = "/test-session";
       }
     } catch (error) {
       setErr("Network error. Please try again.");

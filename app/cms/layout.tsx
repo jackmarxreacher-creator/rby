@@ -9,11 +9,25 @@ import { IdleLogout } from "./components/IdleLogout";
 export const dynamic = 'force-dynamic';
 
 export default async function CmsLayout({ children }: { children: React.ReactNode }) {
+  console.log("CMS Layout: Starting session check...");
+  
   const session = await getAuth();
+  
+  console.log("CMS Layout: Session result:", {
+    hasSession: !!session,
+    hasUser: !!session?.user,
+    user: session?.user ? { 
+      id: session.user.id, 
+      email: session.user.email 
+    } : null
+  });
 
   if (!session?.user) {
+    console.log("CMS Layout: No session/user, redirecting to login");
     redirect("/login");
   }
+
+  console.log("CMS Layout: Valid session found, rendering CMS");
 
   return (
     <div className="flex h-screen bg-[#faf9f6]">
