@@ -9,25 +9,32 @@ import { IdleLogout } from "./components/IdleLogout";
 export const dynamic = 'force-dynamic';
 
 export default async function CmsLayout({ children }: { children: React.ReactNode }) {
-  console.log("CMS Layout: Starting session check...");
-  
-  const session = await getAuth();
-  
-  console.log("CMS Layout: Session result:", {
-    hasSession: !!session,
-    hasUser: !!session?.user,
-    user: session?.user ? { 
-      id: session.user.id, 
-      email: session.user.email 
-    } : null
-  });
-
-  if (!session?.user) {
-    console.log("CMS Layout: No session/user, redirecting to login");
+  try {
+    console.log("=== CMS LAYOUT SESSION CHECK ===");
+    
+    const cookieStore = await cookies();
+    const allCookies = cookieStore.toString();
+    console.log("CMS Layout - All cookies:", allCookies.substring(0, 200) + "...");
+    
+    const session = await getAuth();
+    console.log("CMS Layout - Session result:", session);
+    
+    if (!session) {
+      console.log("CMS Layout: No session object, redirecting to login");
+      redirect("/login");
+    }
+    
+    if (!session.user) {
+      console.log("CMS Layout: No user in session, redirecting to login");
+      redirect("/login");
+    }
+    
+    console.log("CMS Layout: Valid session found for user:", session.user.email);
+    console.log("=== CMS LAYOUT SUCCESS ===");
+  } catch (error) {
+    console.error("CMS Layout: Error during session check:", error);
     redirect("/login");
   }
-
-  console.log("CMS Layout: Valid session found, rendering CMS");
 
   return (
     <div className="flex h-screen bg-[#faf9f6]">

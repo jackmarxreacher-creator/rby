@@ -43,9 +43,9 @@ export default function CmsLoginPage() {
       } else {
         console.log("Login successful, data:", data);
         
-        // Redirect to test session page first to debug
-        console.log("Redirecting to test session page...");
-        window.location.href = "/test-session";
+        // Session is working, so redirect directly to CMS
+        console.log("Redirecting to CMS...");
+        window.location.href = "/cms";
       }
     } catch (error) {
       setErr("Network error. Please try again.");
