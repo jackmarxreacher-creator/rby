@@ -41,10 +41,28 @@ export default function CmsLoginPage() {
         setErr(error.message || "Login failed");
         setLoading(false);
       } else {
-        console.log("Login successful, redirecting...");
-        // Force a page refresh to ensure session cookies are properly set
-        window.location.href = "/cms";
-        // Note: don't set loading to false here as we're redirecting
+        console.log("Login successful, checking session...");
+        
+        // Wait a moment for session to be established, then verify it
+        setTimeout(async () => {
+          try {
+            const sessionCheck = await authClient.getSession();
+            console.log("Session check:", sessionCheck);
+            
+            if (sessionCheck.data) {
+              console.log("Session confirmed, redirecting to CMS...");
+              window.location.href = "/cms";
+            } else {
+              console.log("No session found, retrying...");
+              setErr("Login successful but session not established. Please try again.");
+              setLoading(false);
+            }
+          } catch (sessionError) {
+            console.error("Session check failed:", sessionError);
+            setErr("Login successful but couldn't establish session. Please try again.");
+            setLoading(false);
+          }
+        }, 1000);
       }
     } catch (error) {
       setErr("Network error. Please try again.");
