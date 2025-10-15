@@ -5,23 +5,13 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import { IdleLogout } from "./components/IdleLogout";
 
+// Force dynamic rendering for all CMS routes
+export const dynamic = 'force-dynamic';
+
 export default async function CmsLayout({ children }: { children: React.ReactNode }) {
-  try {
-    console.log("CMS Layout - Checking session...");
-    
-    // Use the getAuth helper function
-    const session = await getAuth();
-    
-    console.log("CMS Layout - Session result:", session);
+  const session = await getAuth();
 
-    if (!session?.user) {
-      console.log("No valid session found, redirecting to login");
-      redirect("/login");
-    }
-
-    console.log("Valid session found for user:", session.user.email);
-  } catch (error) {
-    console.error("CMS Layout - Error checking session:", error);
+  if (!session?.user) {
     redirect("/login");
   }
 
