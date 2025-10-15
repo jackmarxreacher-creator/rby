@@ -1,14 +1,26 @@
 -- CreateEnum
-CREATE TYPE "public"."Role" AS ENUM ('ADMIN', 'EDITOR', 'VIEWER');
+CREATE TYPE "public"."StaffRole" AS ENUM ('ADMIN', 'EDITOR', 'MANAGER', 'STAFF');
 
 -- CreateEnum
-CREATE TYPE "public"."Category" AS ENUM ('Beer', 'Wine', 'Spirits', 'Liqueur', 'Cocktail', 'SoftDrink', 'Juice', 'Mocktail', 'Water');
+CREATE TYPE "public"."Department" AS ENUM ('Administration', 'Finance', 'HR', 'Sales', 'Warehouse');
+
+-- CreateEnum
+CREATE TYPE "public"."BusinessType" AS ENUM ('WHOLESALE', 'RETAIL');
 
 -- CreateEnum
 CREATE TYPE "public"."OrderStatus" AS ENUM ('RECEIVED', 'CANCELED', 'PROCESSING', 'SHIPPED', 'COMPLETED');
 
 -- CreateEnum
-CREATE TYPE "public"."BusinessType" AS ENUM ('WHOLESALE', 'RETAIL');
+CREATE TYPE "public"."Category" AS ENUM ('STOUT', 'RTD', 'LAGERS', 'BITTERS', 'GIN', 'LIQUEUR', 'RUM', 'TEQUILA', 'VODKA', 'SINGLE_MALT_WHISKY', 'WHISKY');
+
+-- CreateEnum
+CREATE TYPE "public"."UOM" AS ENUM ('CAS', 'BOTTLE');
+
+-- CreateEnum
+CREATE TYPE "public"."GalleryItemType" AS ENUM ('photo', 'video');
+
+-- CreateEnum
+CREATE TYPE "public"."BlogCategory" AS ENUM ('Distribution', 'Logistics', 'Partnerships', 'Innovation', 'Sustainability', 'News');
 
 -- CreateTable
 CREATE TABLE "public"."User" (
@@ -18,7 +30,8 @@ CREATE TABLE "public"."User" (
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "image" TEXT,
     "phoneNumber" TEXT,
-    "role" "public"."Role" NOT NULL DEFAULT 'VIEWER',
+    "role" "public"."StaffRole",
+    "department" "public"."Department",
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -31,10 +44,15 @@ CREATE TABLE "public"."Customer" (
     "name" TEXT NOT NULL,
     "businessName" TEXT,
     "businessType" "public"."BusinessType" NOT NULL,
+    "uom" "public"."UOM" NOT NULL DEFAULT 'BOTTLE',
+    "casePack" INTEGER NOT NULL DEFAULT 0,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "location" TEXT,
     "address" TEXT,
+    "image" TEXT DEFAULT '/images/user.jpg',
+    "createdById" TEXT,
+    "updatedById" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -74,6 +92,8 @@ CREATE TABLE "public"."Product" (
     "name" TEXT NOT NULL,
     "image" TEXT,
     "size" TEXT NOT NULL,
+    "uom" "public"."UOM" NOT NULL DEFAULT 'BOTTLE',
+    "casePack" INTEGER NOT NULL DEFAULT 0,
     "wholesalePrice" INTEGER NOT NULL,
     "retailPrice" INTEGER NOT NULL,
     "description" TEXT,
@@ -81,6 +101,8 @@ CREATE TABLE "public"."Product" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "category" "public"."Category" NOT NULL,
+    "createdById" TEXT,
+    "updatedById" TEXT,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -130,6 +152,54 @@ CREATE TABLE "public"."Verification" (
     CONSTRAINT "Verification_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "public"."GalleryItem" (
+    "id" TEXT NOT NULL,
+    "type" "public"."GalleryItemType" NOT NULL,
+    "title" TEXT NOT NULL,
+    "thumbnail" TEXT NOT NULL,
+    "src" TEXT NOT NULL,
+    "createdById" TEXT,
+    "updatedById" TEXT,
+    "deletedById" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "GalleryItem_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."BlogPost" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "subHeading" TEXT,
+    "caption" TEXT,
+    "slug" TEXT NOT NULL,
+    "excerpt" TEXT NOT NULL,
+    "coverImage" TEXT,
+    "content" JSONB NOT NULL,
+    "isPublished" BOOLEAN NOT NULL DEFAULT false,
+    "category" "public"."BlogCategory" NOT NULL DEFAULT 'News',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdById" TEXT,
+    "updatedById" TEXT,
+
+    CONSTRAINT "BlogPost_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."UserActivityLog" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "action" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "metadata" JSONB,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "UserActivityLog_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "public"."User"("email");
 
@@ -140,6 +210,21 @@ CREATE UNIQUE INDEX "User_phoneNumber_key" ON "public"."User"("phoneNumber");
 CREATE UNIQUE INDEX "Customer_email_key" ON "public"."Customer"("email");
 
 -- CreateIndex
+CREATE INDEX "Customer_createdById_idx" ON "public"."Customer"("createdById");
+
+-- CreateIndex
+CREATE INDEX "Customer_updatedById_idx" ON "public"."Customer"("updatedById");
+
+-- CreateIndex
+CREATE INDEX "Order_createdById_idx" ON "public"."Order"("createdById");
+
+-- CreateIndex
+CREATE INDEX "Order_editedById_idx" ON "public"."Order"("editedById");
+
+-- CreateIndex
+CREATE INDEX "Order_processedById_idx" ON "public"."Order"("processedById");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Session_token_key" ON "public"."Session"("token");
 
 -- CreateIndex
@@ -147,6 +232,27 @@ CREATE UNIQUE INDEX "Account_providerId_accountId_key" ON "public"."Account"("pr
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Verification_identifier_value_key" ON "public"."Verification"("identifier", "value");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "BlogPost_slug_key" ON "public"."BlogPost"("slug");
+
+-- CreateIndex
+CREATE INDEX "BlogPost_slug_idx" ON "public"."BlogPost"("slug");
+
+-- CreateIndex
+CREATE INDEX "BlogPost_isPublished_idx" ON "public"."BlogPost"("isPublished");
+
+-- CreateIndex
+CREATE INDEX "UserActivityLog_userId_idx" ON "public"."UserActivityLog"("userId");
+
+-- CreateIndex
+CREATE INDEX "UserActivityLog_timestamp_idx" ON "public"."UserActivityLog"("timestamp");
+
+-- AddForeignKey
+ALTER TABLE "public"."Customer" ADD CONSTRAINT "Customer_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."Customer" ADD CONSTRAINT "Customer_updatedById_fkey" FOREIGN KEY ("updatedById") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Order" ADD CONSTRAINT "Order_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "public"."Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -167,7 +273,31 @@ ALTER TABLE "public"."OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN
 ALTER TABLE "public"."OrderItem" ADD CONSTRAINT "OrderItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "public"."Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "public"."Product" ADD CONSTRAINT "Product_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."Product" ADD CONSTRAINT "Product_updatedById_fkey" FOREIGN KEY ("updatedById") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "public"."Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."GalleryItem" ADD CONSTRAINT "GalleryItem_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."GalleryItem" ADD CONSTRAINT "GalleryItem_updatedById_fkey" FOREIGN KEY ("updatedById") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."GalleryItem" ADD CONSTRAINT "GalleryItem_deletedById_fkey" FOREIGN KEY ("deletedById") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."BlogPost" ADD CONSTRAINT "BlogPost_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."BlogPost" ADD CONSTRAINT "BlogPost_updatedById_fkey" FOREIGN KEY ("updatedById") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."UserActivityLog" ADD CONSTRAINT "UserActivityLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
