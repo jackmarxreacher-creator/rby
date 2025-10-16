@@ -10,7 +10,8 @@ import { uploadPublicFile, deletePublicFileIfLocal } from "@/lib/storage";
 async function uploadImage(file: File) {
   if (!file || file.size === 0) return undefined;
   // Use Vercel Blob in prod; local filesystem in dev
-  return uploadPublicFile(file, "images/new_products");
+  // Upload to Cloudinary folder: rby/images/products (via lib/storage)
+  return uploadPublicFile(file, "images/products");
 }
 
 /* ----------  helper: current user ID  ---------- */

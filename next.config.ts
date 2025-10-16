@@ -1,6 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/deg8d8zl7/**",
+      },
+    ],
+  },
   // Webpack alias to resolve 'emitter' -> 'events' for html-pdf-node dependencies
   webpack(config) {
     config.resolve = config.resolve || {};

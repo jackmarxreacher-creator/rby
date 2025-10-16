@@ -9,20 +9,12 @@ import { z } from "zod";
 import { authClient } from "@/lib/auth-client";
 import { getAuth } from "@/lib/auth";
 import { logUserActivity } from "@/lib/logging";
-
-const UPLOAD_DIR = path.join(process.cwd(), "public", "images", "users");
-
-async function ensureDir() {
-  await fs.mkdir(UPLOAD_DIR, { recursive: true });
-}
+import { uploadPublicFile } from "@/lib/storage";
 
 async function uploadImage(file: File | undefined) {
   if (!file || file.size === 0) return undefined;
-  await ensureDir();
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const filename = `${randomUUID()}-${file.name}`.replace(/\s/g, "_");
-  await fs.writeFile(path.join(UPLOAD_DIR, filename), buffer);
-  return `/images/users/${filename}`;
+  // Map to Cloudinary folder: rby/images/staff
+  return uploadPublicFile(file, "images/staff");
 }
 
 // Zod enums matching prisma
@@ -178,11 +170,7 @@ export async function updateUser(id: string, form: FormData) {
     if (parsed.image instanceof File) {
       imagePath = await uploadImage(parsed.image);
       const existingUser = await prisma.user.findUnique({ where: { id } });
-      if (existingUser?.image) {
-        try {
-          await fs.unlink(path.join(process.cwd(), "public", existingUser.image));
-        } catch {}
-      }
+      // optional: we can delete old local files; for Cloudinary, skipping deletion by default
     }
 
     const hashedPassword = parsed.password ? await (async () => {

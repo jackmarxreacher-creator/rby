@@ -1,15 +1,11 @@
 "use server";
 
-import fs from "fs/promises";
-import path from "path";
 import { prisma } from "@/lib/prisma";
 import { GalleryItemType } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { logUserActivity } from "@/lib/logging";
 import { getAuth } from "@/lib/auth"; // Better-Auth server helper
-
-const UPLOAD_DIR = path.join(process.cwd(), "public", "images", "gallery");
-const VIDEO_THUMBNAIL_DIR = path.join(process.cwd(), "public", "videos", "thumbnails");
+import { uploadPublicFile } from "@/lib/storage";
 
 /* ----------  helper: current user ID  ---------- */
 async function currentUserId() {
@@ -26,20 +22,16 @@ export async function createGalleryItem(data: FormData) {
     if (data.get("type") === "photo") {
       const photo = data.get("photo") as File;
       if (photo && photo.size > 0) {
-        const photoName = `${Date.now()}-${photo.name}`;
-        const photoPath = path.join(UPLOAD_DIR, photoName);
-        const buffer = Buffer.from(await photo.arrayBuffer());
-        await fs.writeFile(photoPath, buffer);
-        thumbnailPath = `/images/gallery/${photoName}`;
+        // Cloudinary: rby/images/gallery
+        const url = await uploadPublicFile(photo, "images/gallery");
+        thumbnailPath = url || null;
       }
     } else if (data.get("type") === "video") {
       const videoThumbnail = data.get("thumbnail") as File | string | null;
       if (videoThumbnail && videoThumbnail instanceof File && videoThumbnail.size > 0) {
-        const thumbnailName = `${Date.now()}-${videoThumbnail.name}`;
-        const thumbnailPathDisk = path.join(VIDEO_THUMBNAIL_DIR, thumbnailName);
-        const buffer = Buffer.from(await videoThumbnail.arrayBuffer());
-        await fs.writeFile(thumbnailPathDisk, buffer);
-        thumbnailPath = `/videos/thumbnails/${thumbnailName}`;
+        // Cloudinary: rby/videos
+        const url = await uploadPublicFile(videoThumbnail, "videos");
+        thumbnailPath = url || null;
       } else if (typeof videoThumbnail === "string" && videoThumbnail.startsWith("http")) {
         thumbnailPath = videoThumbnail;
       } else {
@@ -86,20 +78,14 @@ export async function updateGalleryItem(id: string, data: FormData) {
     if (data.get("type") === "photo") {
       const photo = data.get("photo") as File;
       if (photo && photo.size > 0) {
-        const photoName = `${Date.now()}-${photo.name}`;
-        const photoPath = path.join(UPLOAD_DIR, photoName);
-        const buffer = Buffer.from(await photo.arrayBuffer());
-        await fs.writeFile(photoPath, buffer);
-        thumbnailPath = `/images/gallery/${photoName}`;
+        const url = await uploadPublicFile(photo, "images/gallery");
+        thumbnailPath = url || null;
       }
     } else if (data.get("type") === "video") {
       const videoThumbnail = data.get("thumbnail") as File | string | null;
       if (videoThumbnail && videoThumbnail instanceof File && videoThumbnail.size > 0) {
-        const thumbnailName = `${Date.now()}-${videoThumbnail.name}`;
-        const thumbnailPathDisk = path.join(VIDEO_THUMBNAIL_DIR, thumbnailName);
-        const buffer = Buffer.from(await videoThumbnail.arrayBuffer());
-        await fs.writeFile(thumbnailPathDisk, buffer);
-        thumbnailPath = `/videos/thumbnails/${thumbnailName}`;
+        const url = await uploadPublicFile(videoThumbnail, "videos");
+        thumbnailPath = url || null;
       } else if (typeof videoThumbnail === "string" && videoThumbnail.startsWith("http")) {
         thumbnailPath = videoThumbnail;
       } else {
