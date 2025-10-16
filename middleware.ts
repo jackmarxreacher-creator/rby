@@ -18,8 +18,14 @@ export async function middleware(req: NextRequest) {
   }
 
   /* 3️⃣  read session cookie  */
-  const sessionCookie = req.cookies.get('better-auth.session_token');
-  const isAuthenticated = !!sessionCookie;
+  // Better Auth sets secure cookie names with the `__Secure-` prefix in production (HTTPS).
+  // Check both names to support local/dev and production.
+  const sessionToken =
+    req.cookies.get('__Secure-better-auth.session_token')?.value ??
+    req.cookies.get('better-auth.session_token')?.value ??
+    null;
+
+  const isAuthenticated = !!sessionToken;
 
   /* 4️⃣  unauthenticated → login  */
   if (!isAuthenticated) {
