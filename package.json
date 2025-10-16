@@ -45,6 +45,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "exceljs": "^4.4.0",
+  "@vercel/blob": "^0.25.1",
     "framer-motion": "^12.23.12",
     "happy-dom": "^18.0.1",
     "html-pdf-node": "^1.0.8",

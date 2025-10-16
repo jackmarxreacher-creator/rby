@@ -1,27 +1,16 @@
 //-------- Added Logging in Created By and Updated By -------//
 "use server";
-import fs from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { Category } from "@prisma/client";
 import { logUserActivity } from "@/lib/logging";
 import { getAuth } from "@/lib/auth"; // Better-Auth server helper
-
-const UPLOAD_DIR = path.join(process.cwd(), "public", "images", "new_products");
-
-async function ensureDir() {
-  await fs.mkdir(UPLOAD_DIR, { recursive: true });
-}
+import { uploadPublicFile, deletePublicFileIfLocal } from "@/lib/storage";
 
 async function uploadImage(file: File) {
   if (!file || file.size === 0) return undefined;
-  await ensureDir();
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const filename = `${randomUUID()}-${file.name}`.replace(/\s/g, "_");
-  await fs.writeFile(path.join(UPLOAD_DIR, filename), buffer);
-  return `/images/new_products/${filename}`;
+  // Use Vercel Blob in prod; local filesystem in dev
+  return uploadPublicFile(file, "images/new_products");
 }
 
 /* ----------  helper: current user ID  ---------- */
@@ -117,11 +106,8 @@ export async function deleteProduct(id: string): Promise<Result> {
 
     const product = await prisma.product.findUnique({ where: { id } });
     if (product?.image) {
-      try {
-        await fs.unlink(path.join(process.cwd(), "public", product.image));
-      } catch {
-        // fail silently
-      }
+      // Best-effort local delete; blob URLs are skipped
+      await deletePublicFileIfLocal(product.image);
     }
 
     await prisma.product.delete({ where: { id } });
