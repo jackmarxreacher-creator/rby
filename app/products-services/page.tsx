@@ -4,8 +4,10 @@ import { getProducts } from "@/app/products-services/actions";
 import Products from "./sections/Products";
 import Services from "./sections/Services";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProductsPage() {
-  const products = await getProducts(); // Fetch products from the database
+  const products = (await getProducts()) ?? [];
 
   return (
     <>

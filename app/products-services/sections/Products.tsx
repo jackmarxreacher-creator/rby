@@ -9,35 +9,59 @@ import { MdInventory } from 'react-icons/md';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 const ITEMS_PER_PAGE = 12;
-const categories = [
-  "All", "Beer", "Spirits", "Cocktails", "Wine", "Juice",
-  "Liqueur", "Mocktail", "SoftDrink", "Water"
+
+// Map UI labels to Prisma Category enum values
+type CategoryValue =
+  | null
+  | "STOUT"
+  | "RTD"
+  | "LAGERS"
+  | "BITTERS"
+  | "GIN"
+  | "LIQUEUR"
+  | "RUM"
+  | "TEQUILA"
+  | "VODKA"
+  | "SINGLE_MALT_WHISKY"
+  | "WHISKY";
+
+const categoryOptions: { label: string; value: CategoryValue }[] = [
+  { label: "All", value: null },
+  { label: "Stout", value: "STOUT" },
+  { label: "RTD", value: "RTD" },
+  { label: "Lagers", value: "LAGERS" },
+  { label: "Bitters", value: "BITTERS" },
+  { label: "Gin", value: "GIN" },
+  { label: "Liqueur", value: "LIQUEUR" },
+  { label: "Rum", value: "RUM" },
+  { label: "Tequila", value: "TEQUILA" },
+  { label: "Vodka", value: "VODKA" },
+  { label: "Single Malt Whisky", value: "SINGLE_MALT_WHISKY" },
+  { label: "Whisky", value: "WHISKY" },
 ];
 
 interface Props {
   products: any[];
 }
 
-/* helper – returns a thumbnail URL for YouTube embeds */
-const thumb = (src: string) =>
-  src.includes("youtube.com/embed/")
+/* helper – returns a thumbnail URL for YouTube embeds; falls back to default image */
+const thumb = (src?: string) =>
+  src && src.includes("youtube.com/embed/")
     ? src.replace("/embed/", "/vi/") + "/0.jpg"
-    : src;
+    : src || "/images/default-image.jpg";
 
 export default function Products({ products }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState<CategoryValue>(null);
 
   /* ----------  search + category filter  ---------- */
   const filteredProducts = useMemo(() => {
     let list = products;
 
-    // category
-    if (selectedCategory !== "All") {
-      list = list.filter((p) =>
-        p.category?.toLowerCase() === selectedCategory.toLowerCase()
-      );
+    // category (match Prisma enum string exactly)
+    if (selectedCategory) {
+      list = list.filter((p) => p.category === selectedCategory);
     }
 
     // search
@@ -86,20 +110,20 @@ export default function Products({ products }: Props) {
           />
 
           <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
+            {categoryOptions.map((opt) => (
               <button
-                key={cat}
+                key={opt.label}
                 onClick={() => {
-                  setSelectedCategory(cat);
+                  setSelectedCategory(opt.value);
                   setCurrentPage(1);
                 }}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                  selectedCategory === cat
+                  selectedCategory === opt.value
                     ? "bg-[#be965b] text-white"
                     : "bg-[#f3ede5] text-gray-800 hover:bg-[#be965b]/60 hover:text-white"
                 }`}
               >
-                {cat}
+                {opt.label}
               </button>
             ))}
           </div>
