@@ -50,7 +50,7 @@ export default function Footer({ posts = [] }: { posts?: BlogPost[] }) {
             <li><Link href="/blog" className="hover:text-[#be965b]">Blog</Link></li>
             <li><Link href="/contact" className="hover:text-[#be965b]">Contact</Link></li>
             <li><Link href="/login" className="hover:text-[#be965b]">CMS</Link></li>
-            <li><Link href="/signup" className="hover:text-[#be965b]">Enter</Link></li>
+            {/* <li><Link href="/signup" className="hover:text-[#be965b]">Enter</Link></li> */}
           </ul>
         </div>
 
