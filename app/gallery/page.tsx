@@ -2,8 +2,10 @@ import PageHero from "@/app/common/PageHero";
 import GalleryGrid from "./sections/GalleryGrid";
 import { getGalleryItems } from "./actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function GalleryPage() {
-  const rawItems = await getGalleryItems();
+  const rawItems = (await getGalleryItems()) ?? [];
 
   const galleryItems = rawItems.map((item) => ({
     id: item.id,
