@@ -81,8 +81,19 @@ export async function createUser(form: FormData) {
       department: form.get("department") as string | null,
       image: form.get("image") as File | undefined,
     };
+    // Normalize null/empty values so Zod optional strings don't receive null
+    const normalized = {
+      ...values,
+      name: values.name ?? undefined,
+      email: values.email ?? undefined,
+      password: values.password ? String(values.password) : undefined,
+      role: values.role || undefined,
+      phoneNumber: values.phoneNumber || undefined,
+      department: values.department || undefined,
+      image: values.image ?? undefined,
+    };
 
-    const parsed = userSchema.partial().parse(values);
+    const parsed = userSchema.partial().parse(normalized);
 
     if (!parsed.email || !parsed.name) {
       return { ok: false, message: "name and email are required" } as ActionResult;
@@ -93,7 +104,7 @@ export async function createUser(form: FormData) {
     if (existing) return { ok: false, message: "Email already taken" } as ActionResult;
 
     // Optional: handle image upload
-    const imagePath = await uploadImage(parsed.image as File | undefined);
+  const imagePath = await uploadImage(parsed.image as File | undefined);
 
     const passwordToStore = parsed.password ? await (async () => {
       try {
@@ -150,8 +161,19 @@ export async function updateUser(id: string, form: FormData) {
       department: form.get("department") as string | null,
       image: form.get("image") as File | undefined,
     };
+    // Normalize null/empty values so Zod optional strings don't receive null
+    const normalized = {
+      ...values,
+      name: values.name ?? undefined,
+      email: values.email ?? undefined,
+      password: values.password ? String(values.password) : undefined,
+      role: values.role || undefined,
+      phoneNumber: values.phoneNumber || undefined,
+      department: values.department || undefined,
+      image: values.image ?? undefined,
+    };
 
-    const parsed = userSchema.partial().parse(values);
+    const parsed = userSchema.partial().parse(normalized);
 
     // Email uniqueness check
     if (parsed.email) {

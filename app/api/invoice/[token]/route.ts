@@ -105,28 +105,35 @@ function renderInvoiceHtml(order: any) {
 }
 
 export async function GET(_req: Request, context: { params: Promise<{ token: string }> }) {
-  const { token } = await context.params;
-  const payload = verifySignedToken(token);
-  if (!payload) return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
+  try {
+    const { token } = await context.params;
+    const payload = verifySignedToken(token);
+    if (!payload) return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
 
-  const order = await prisma.order.findUnique({
-    where: { id: payload.orderId },
-    include: { customer: true, orderItems: { include: { product: true } } },
-  });
-  if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const order = await prisma.order.findUnique({
+      where: { id: payload.orderId },
+      include: { customer: true, orderItems: { include: { product: true } } },
+    });
+    if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const html = renderInvoiceHtml(order);
-  const buffer = await buildPdfBuffer(html);
+    const html = renderInvoiceHtml(order);
+    const buffer = await buildPdfBuffer(html);
 
-  const customer = sanitizeFilename(order.customer.name || "customer");
-  const filename = `invoice_${customer}_${order.id.slice(-6)}_${timestamp()}.pdf`;
+    const customer = sanitizeFilename(order.customer.name || "customer");
+    const filename = `invoice_${customer}_${order.id.slice(-6)}_${timestamp()}.pdf`;
 
-  return new NextResponse(new Uint8Array(buffer), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${filename}"`,
-      "Cache-Control": "no-store",
-    },
-  });
+    return new NextResponse(new Uint8Array(buffer), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Cache-Control": "no-store",
+        // Expose filename header to client JS when using fetch
+        "Access-Control-Expose-Headers": "Content-Disposition",
+      },
+    });
+  } catch (e: any) {
+    console.error("/api/invoice error", e);
+    return NextResponse.json({ error: e?.message || "Failed to generate invoice" }, { status: 500 });
+  }
 }

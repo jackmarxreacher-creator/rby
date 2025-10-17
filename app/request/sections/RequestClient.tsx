@@ -33,7 +33,11 @@ export default function RequestClient({ products }: { products: Product[] }) {
     if (res?.ok && res?.downloadUrl) {
       try {
         // Fetch the PDF and download it directly (avoids opening a new tab)
-        const r = await fetch(res.downloadUrl as string, { method: "GET" });
+        const r = await fetch(res.downloadUrl as string, {
+          method: "GET",
+          cache: "no-store",
+          headers: { "Accept": "application/pdf" },
+        });
         if (!r.ok) throw new Error("Download failed");
 
         const cd = r.headers.get("content-disposition") || "";
@@ -41,6 +45,9 @@ export default function RequestClient({ products }: { products: Product[] }) {
         const suggested = match?.[1] ?? "invoice.pdf";
 
         const blob = await r.blob();
+        if (blob.type && !blob.type.includes("pdf")) {
+          throw new Error("Server did not return a PDF");
+        }
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -51,9 +58,9 @@ export default function RequestClient({ products }: { products: Product[] }) {
         URL.revokeObjectURL(url);
 
         toast({ title: "Invoice downloaded", description: "A copy of your invoice has been downloaded.", duration: 4500 });
-      } catch (e) {
-        // Fallback: open in the same tab if direct download fails
-        window.location.href = res.downloadUrl as string;
+      } catch (e: any) {
+        toast({ title: "Download failed", description: e?.message ?? "Please try again.", duration: 5500 });
+        return; // don't show appreciation screen on failure
       }
     } else if (res && !res.ok) {
       toast({ title: "Failed to submit request", description: res.message ?? "Please try again.", duration: 5500 });

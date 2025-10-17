@@ -107,16 +107,8 @@ export async function createRequest(data: FormData, isGuest = false) {
     // For public guests, return a short-lived download URL of the invoice
     if (isGuest) {
       const token = createSignedToken({ orderId: order.id }, 10 * 60); // 10 minutes
-      // prefer absolute URL when available
-      const base = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL || "";
-      const origin = base
-        ? base.startsWith("http")
-          ? base
-          : `https://${base}`
-        : "";
-      const downloadUrl = origin
-        ? `${origin}/api/invoice/${token}`
-        : `/api/invoice/${token}`;
+      // Return a same-origin relative URL to avoid cross-origin/new-tab behaviors
+      const downloadUrl = `/api/invoice/${token}`;
 
       return {
         ok: true,
