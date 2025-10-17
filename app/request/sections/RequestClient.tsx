@@ -30,18 +30,29 @@ export default function RequestClient({ products }: { products: Product[] }) {
 
   async function handleSubmit(formData: FormData) {
     const res = await submitRequest(formData);
-    // Try to trigger the download in a new tab (less likely to be blocked)
     if (res?.ok && res?.downloadUrl) {
       try {
-        // Use a temp anchor to trigger download without navigating away
+        // Fetch the PDF and download it directly (avoids opening a new tab)
+        const r = await fetch(res.downloadUrl as string, { method: "GET" });
+        if (!r.ok) throw new Error("Download failed");
+
+        const cd = r.headers.get("content-disposition") || "";
+        const match = cd.match(/filename="?([^";]+)"?/i);
+        const suggested = match?.[1] ?? "invoice.pdf";
+
+        const blob = await r.blob();
+        const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        a.href = res.downloadUrl as string;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
+        a.href = url;
+        a.download = suggested;
+        document.body.appendChild(a);
         a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
         toast({ title: "Invoice downloaded", description: "A copy of your invoice has been downloaded.", duration: 4500 });
-      } catch {
-        // Fallback: navigate current tab
+      } catch (e) {
+        // Fallback: open in the same tab if direct download fails
         window.location.href = res.downloadUrl as string;
       }
     } else if (res && !res.ok) {
