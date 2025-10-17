@@ -8,12 +8,14 @@ import Appreciation from "./Appreciation";
 import Countdown from "./Countdown";
 import { submitRequest } from "../actions";
 import { Product } from "@prisma/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function RequestClient({ products }: { products: Product[] }) {
   const [submitted, setSubmitted] = useState(false);
   const [existingMode, setExistingMode] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const handleSelectCustomer = (c: any) => {
     setSelectedCustomer(c);
@@ -27,7 +29,29 @@ export default function RequestClient({ products }: { products: Product[] }) {
   };
 
   async function handleSubmit(formData: FormData) {
-    await submitRequest(formData);
+    const res = await submitRequest(formData);
+    // Try to trigger the download in a new tab (less likely to be blocked)
+    if (res?.ok && res?.downloadUrl) {
+      try {
+        // Use a temp anchor to trigger download without navigating away
+        const a = document.createElement("a");
+        a.href = res.downloadUrl as string;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.click();
+        toast({ title: "Invoice downloaded", description: "A copy of your invoice has been downloaded.", duration: 4500 });
+      } catch {
+        // Fallback: navigate current tab
+        window.location.href = res.downloadUrl as string;
+      }
+    } else if (res && !res.ok) {
+      toast({ title: "Failed to submit request", description: res.message ?? "Please try again.", duration: 5500 });
+      return; // don't show appreciation screen on failure
+    } else {
+      // Unknown shape – treat as success without download
+      toast({ title: "Request submitted", description: "Thank you for your request.", duration: 4000 });
+    }
+
     setSubmitted(true);
   }
 

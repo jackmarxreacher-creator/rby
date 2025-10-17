@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getAuth } from "@/lib/auth"; // Better-Auth server helper
 import { logUserActivity } from "@/lib/logging";
+import { createSignedToken } from "@/lib/signed-token";
 
 /* 1.  Fetch all requests  -------------------------------------------------- */
 export async function getRequests() {
@@ -103,7 +104,29 @@ export async function createRequest(data: FormData, isGuest = false) {
 
     revalidatePath("/cms/requests");
 
-    return { ok: true, message: `Created request for ${customerName}` };
+    // For public guests, return a short-lived download URL of the invoice
+    if (isGuest) {
+      const token = createSignedToken({ orderId: order.id }, 10 * 60); // 10 minutes
+      // prefer absolute URL when available
+      const base = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL || "";
+      const origin = base
+        ? base.startsWith("http")
+          ? base
+          : `https://${base}`
+        : "";
+      const downloadUrl = origin
+        ? `${origin}/api/invoice/${token}`
+        : `/api/invoice/${token}`;
+
+      return {
+        ok: true,
+        message: `Created request for ${customerName}`,
+        orderId: order.id,
+        downloadUrl,
+      } as const;
+    }
+
+    return { ok: true, message: `Created request for ${customerName}`, orderId: order.id } as const;
   } catch (err: any) {
     console.error("createRequest error", err);
     return { ok: false, message: err?.message || "Failed to create request" };
