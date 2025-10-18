@@ -30,47 +30,52 @@ export default function RequestClient({ products }: { products: Product[] }) {
 
   async function handleSubmit(formData: FormData) {
     const res = await submitRequest(formData);
-    if (res?.ok && res?.downloadUrl) {
-      try {
-        // Fetch the PDF and download it directly (avoids opening a new tab)
-        const r = await fetch(res.downloadUrl as string, {
-          method: "GET",
-          cache: "no-store",
-          headers: { "Accept": "application/pdf" },
-        });
-        if (!r.ok) throw new Error("Download failed");
-
-        const cd = r.headers.get("content-disposition") || "";
-        const match = cd.match(/filename="?([^";]+)"?/i);
-        const suggested = match?.[1] ?? "invoice.pdf";
-
-        const blob = await r.blob();
-        if (blob.type && !blob.type.includes("pdf")) {
-          throw new Error("Server did not return a PDF");
-        }
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = suggested;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-
-        toast({ title: "Invoice downloaded", description: "A copy of your invoice has been downloaded.", duration: 4500 });
-      } catch (e: any) {
-        toast({ title: "Download failed", description: e?.message ?? "Please try again.", duration: 5500 });
-        return; // don't show appreciation screen on failure
-      }
-    } else if (res && !res.ok) {
-      toast({ title: "Failed to submit request", description: res.message ?? "Please try again.", duration: 5500 });
-      return; // don't show appreciation screen on failure
-    } else {
-      // Unknown shape – treat as success without download
-      toast({ title: "Request submitted", description: "Thank you for your request.", duration: 4000 });
+    // Only proceed to appreciation when submission succeeded
+    if (!res?.ok) {
+      toast({ title: "Failed to submit request", description: res?.message ?? "Please try again.", duration: 5500 });
+      return;
     }
 
+    // Show appreciation immediately
     setSubmitted(true);
+
+    // Kick off the download in the background
+    if (res.downloadUrl) {
+      (async () => {
+        try {
+          const r = await fetch(res.downloadUrl as string, {
+            method: "GET",
+            cache: "no-store",
+            headers: { Accept: "application/pdf" },
+          });
+          if (!r.ok) throw new Error("Download failed");
+
+          const cd = r.headers.get("content-disposition") || "";
+          const match = cd.match(/filename="?([^";]+)"?/i);
+          const suggested = match?.[1] ?? "invoice.pdf";
+
+          const blob = await r.blob();
+          if (blob.type && !blob.type.includes("pdf")) {
+            throw new Error("Server did not return a PDF");
+          }
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = suggested;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+
+          toast({ title: "Invoice downloaded", description: "Your copy of the invoice has been downloaded.", duration: 4500 });
+        } catch (e: any) {
+          toast({ title: "Invoice download failed", description: e?.message ?? "You can try again from your email or contact support.", duration: 5500 });
+        }
+      })();
+    } else {
+      // Successful submission but no URL (unexpected) – still keep appreciation
+      toast({ title: "Request submitted", description: "Thank you for your request.", duration: 4000 });
+    }
   }
 
   if (submitted)
